@@ -29,3 +29,12 @@ LLM галлюцинирует при недостатке контекста и
 - **Vector Store**: ChromaDB / FAISS
 - **Frontend**: React + TypeScript или Next.js
 - **LLM провайдеры**: OpenAI API, Ollama (локально)
+
+# Создаём структуру проекта
+New-Item -ItemType Directory -Force -Path "c:\Users\PC\project\otus_dz2\rag_app\backend"
+New-Item -ItemType Directory -Force -Path "c:\Users\PC\project\otus_dz2\rag_app\backend\templates"
+New-Item -ItemType Directory -Force -Path "c:\Users\PC\project\otus_dz2\rag_app\backend\static"
+New-Item -ItemType Directory -Force -Path "c:\Users\PC\project\otus_dz2\rag_app\backend\uploads"
+
+rag_app/backend/main.py
+

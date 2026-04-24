@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG App — UI Концепции</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0f;--surface:#13131a;--border:#1e1e2e;
+  --accent:#6366f1;--accent2:#22d3ee;--accent3:#f59e0b;
+  --text:#e2e8f0;--muted:#64748b;--green:#10b981;--red:#ef4444;
+}
+body{background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* HERO */
+.hero{padding:80px 40px 60px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(99,102,241,.15),transparent);
+  pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;
+  background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);
+  border-radius:100px;padding:6px 16px;font-size:12px;color:var(--accent);
+  margin-bottom:24px;font-family:'JetBrains Mono',monospace}
+.hero h1{font-size:clamp(2rem,5vw,3.5rem);font-weight:800;line-height:1.1;
+  background:linear-gradient(135deg,#e2e8f0 0%,var(--accent) 50%,var(--accent2) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+.hero p{color:var(--muted);font-size:1.1rem;max-width:600px;margin:0 auto 40px}
+.hero-nav{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{padding:12px 24px;border-radius:10px;font-weight:600;font-size:14px;
+  cursor:pointer;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#4f46e5;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+
+/* GRID */
+.section{padding:60px 40px;max-width:1400px;margin:0 auto}
+.section-title{font-size:1.5rem;font-weight:800;margin-bottom:8px}
+.section-sub{color:var(--muted);margin-bottom:40px;font-size:.95rem}
+.concepts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:24px}
+
+/* CARD */
+.concept-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  overflow:hidden;transition:all .3s;cursor:pointer}
+.concept-card:hover{border-color:var(--accent);transform:translateY(-4px);
+  box-shadow:0 20px 60px rgba(99,102,241,.15)}
+.card-preview{height:280px;position:relative;overflow:hidden}
+.card-badge{position:absolute;top:12px;left:12px;z-index:10;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.1);border-radius:100px;
+  padding:4px 12px;font-size:11px;font-family:'JetBrains Mono',monospace}
+.card-badge.chosen{background:rgba(16,185,129,.2);border-color:var(--green);color:var(--green)}
+.card-body{padding:24px}
+.card-title{font-size:1.1rem;font-weight:700;margin-bottom:8px}
+.card-desc{color:var(--muted);font-size:.875rem;line-height:1.6;margin-bottom:16px}
+.card-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tag{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;
+  background:rgba(99,102,241,.1);color:var(--accent);border:1px solid rgba(99,102,241,.2)}
+.tag.green{background:rgba(16,185,129,.1);color:var(--green);border-color:rgba(16,185,129,.2)}
+.tag.amber{background:rgba(245,158,11,.1);color:var(--accent3);border-color:rgba(245,158,11,.2)}
+.card-link{display:inline-flex;align-items:center;gap:6px;color:var(--accent);
+  font-size:.875rem;font-weight:600}
+.card-link:hover{gap:10px}
+
+/* PREVIEW DESIGNS */
+/* V1 — Minimal Split */
+.preview-v1{background:#f8fafc;display:flex;flex-direction:column;height:100%}
+.pv1-header{background:#fff;border-bottom:1px solid #e2e8f0;padding:10px 16px;
+  display:flex;align-items:center;justify-content:space-between}
+.pv1-logo{font-weight:700;font-size:13px;color:#1e293b;display:flex;align-items:center;gap:6px}
+.pv1-select{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;
+  padding:4px 10px;font-size:11px;color:#475569}
+.pv1-body{display:flex;flex:1;overflow:hidden}
+.pv1-sidebar{width:35%;background:#fff;border-right:1px solid #e2e8f0;padding:12px;display:flex;flex-direction:column;gap:8px}
+.pv1-upload{border:2px dashed #cbd5e1;border-radius:8px;padding:12px;text-align:center;
+  font-size:10px;color:#94a3b8}
+.pv1-doc{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px;
+  display:flex;align-items:center;gap:6px;font-size:10px;color:#475569}
+.pv1-doc-icon{width:20px;height:20px;background:#dbeafe;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;font-size:9px}
+.pv1-status{font-size:9px;color:var(--green);margin-left:auto}
+.pv1-chat{flex:1;display:flex;flex-direction:column;padding:12px;gap:8px}
+.pv1-msg{max-width:80%;padding:8px 12px;border-radius:10px;font-size:10px;line-height:1.4}
+.pv1-msg.user{background:#6366f1;color:#fff;align-self:flex-end;border-radius:10px 10px 2px 10px}
+.pv1-msg.bot{background:#fff;border:1px solid #e2e8f0;color:#475569;align-self:flex-start;border-radius:10px 10px 10px 2px}
+.pv1-source{font-size:9px;color:#94a3b8;margin-top:4px}
+.pv1-input{background:#fff;border-top:1px solid #e2e8f0;padding:10px;display:flex;gap:6px}
+.pv1-input input{flex:1;border:1px solid #e2e8f0;border-radius:6px;padding:6px 10px;font-size:10px;background:#f8fafc}
+.pv1-send{background:#6366f1;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:10px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-badge">🎨 UI Showcase · RAG Web App</div>
+  <h1>Визуальные концепции<br>интерфейса</h1>
+  <p>3 дизайн-концепции RAG-приложения для работы с документами через LLM. Выбрана концепция Split-Panel как оптимальная для MVP.</p>
+  <div class="hero-nav">
+    <a href="design_v1/index.html" class="btn btn-primary">✦ Концепция 1 — Minimal</a>
+    <a href="design_v2/index.html" class="btn btn-outline">Концепция 2 — Corporate</a>
+    <a href="design_v3/index.html" class="btn btn-outline">Концепция 3 — Mobile</a>
+  </div>
+</div>
+</body>
+</html>
+
+<script>
+// Добавляем секцию с карточками после загрузки
+document.addEventListener('DOMContentLoaded', () => {
+  const section = document.createElement('div');
+  section.className = 'section';
+  section.innerHTML = `
+    <div class="section-title">Три концепции дизайна</div>
+    <div class="section-sub">Каждая концепция отличается стилем, компоновкой и целевой аудиторией</div>
+    <div class="concepts-grid">
+
+      <div class="concept-card" onclick="location.href='design_v1/index.html'">
+        <div class="card-preview">
+          <span class="card-badge chosen">✓ Выбранная</span>
+          <div class="preview-v1">
+            <div class="pv1-header">
+              <div class="pv1-logo">🧠 RAG App</div>
+              <div class="pv1-select">GPT-4o-mini ▾</div>
+            </div>
+            <div class="pv1-body">
+              <div class="pv1-sidebar">
+                <div class="pv1-upload">📁 Перетащите файл<br>PDF · DOCX · TXT · MD</div>
+                <div class="pv1-doc"><div class="pv1-doc-icon">📄</div>report_2024.pdf<span class="pv1-status">✓ Готов</span></div>
+                <div class="pv1-doc"><div class="pv1-doc-icon">📝</div>spec_v2.md<span class="pv1-status">✓ Готов</span></div>
+              </div>
+              <div class="pv1-chat">
+                <div class="pv1-msg bot">Привет! Загрузите документ и задайте вопрос.</div>
+                <div class="pv1-msg user">Какие ключевые метрики в отчёте?</div>
+                <div class="pv1-msg bot">В отчёте выделены 3 ключевые метрики: ROI +24%, CAC снизился на 18%...<div class="pv1-source">📄 report_2024.pdf · стр. 12</div></div>
+                <div class="pv1-input">
+                  <input placeholder="Введите вопрос..." readonly>
+                  <button class="pv1-send">➤</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Концепция 1 — Minimal Split-Panel</div>
+          <div class="card-desc">Двухпанельный layout: документы слева (30%), чат справа (70%). Белый фон, акцент синий. Максимальный фокус на диалоге.</div>
+          <div class="card-tags">
+            <span class="tag green">✓ Выбрана</span>
+            <span class="tag">Минималистичный</span>
+            <span class="tag">Desktop-first</span>
+          </div>
+          <span class="card-link">Открыть полный дизайн →</span>
+        </div>
+      </div>
+
+      <div class="concept-card" onclick="location.href='design_v2/index.html'">
+        <div class="card-preview" style="background:#1e3a5f">
+          <span class="card-badge">Концепция 2</span>
+          <div style="padding:12px;height:100%;display:flex;flex-direction:column;gap:8px">
+            <div style="background:#162d4a;border-radius:8px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between">
+              <span style="color:#93c5fd;font-size:11px;font-weight:700">🏢 RAG Enterprise</span>
+              <div style="display:flex;gap:8px">
+                <span style="background:#0f2a45;color:#64748b;font-size:9px;padding:3px 8px;border-radius:4px">Документы</span>
+                <span style="background:#2563eb;color:#fff;font-size:9px;padding:3px 8px;border-radius:4px">Чат</span>
+                <span style="background:#0f2a45;color:#64748b;font-size:9px;padding:3px 8px;border-radius:4px">Настройки</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;flex:1">
+              <div style="width:140px;background:#162d4a;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px">
+                <div style="color:#93c5fd;font-size:9px;font-weight:700;margin-bottom:4px">ДОКУМЕНТЫ</div>
+                <div style="background:#1e3a5f;border-radius:4px;padding:6px;font-size:9px;color:#cbd5e1;display:flex;align-items:center;gap:4px">📄 annual_report.pdf</div>
+                <div style="background:#1e3a5f;border-radius:4px;padding:6px;font-size:9px;color:#cbd5e1;display:flex;align-items:center;gap:4px">📝 tech_spec.md</div>
+                <div style="background:#2563eb;border-radius:4px;padding:6px;font-size:9px;color:#fff;text-align:center;cursor:pointer">+ Добавить</div>
+              </div>
+              <div style="flex:1;background:#162d4a;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px">
+                <div style="background:#1e3a5f;border-radius:6px;padding:8px;font-size:9px;color:#93c5fd">🤖 Готов к работе. Выберите документ.</div>
+                <div style="background:#2563eb;border-radius:6px;padding:8px;font-size:9px;color:#fff;align-self:flex-end;max-width:70%">Что такое RAG?</div>
+                <div style="background:#1e3a5f;border-radius:6px;padding:8px;font-size:9px;color:#cbd5e1">RAG — Retrieval-Augmented Generation. Метод улучшения LLM...</div>
+                <div style="margin-top:auto;display:flex;gap:4px">
+                  <div style="flex:1;background:#1e3a5f;border-radius:4px;padding:5px 8px;font-size:9px;color:#64748b">Введите вопрос...</div>
+                  <div style="background:#2563eb;border-radius:4px;padding:5px 10px;font-size:9px;color:#fff">➤</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Концепция 2 — Corporate Dashboard</div>
+          <div class="card-desc">Тёмно-синяя тема, navbar + sidebar. Корпоративный стиль, привычный UX для enterprise-пользователей.</div>
+          <div class="card-tags">
+            <span class="tag amber">Корпоративный</span>
+            <span class="tag">Sidebar</span>
+            <span class="tag">Enterprise</span>
+          </div>
+          <span class="card-link">Открыть полный дизайн →</span>
+        </div>
+      </div>
+
+      <div class="concept-card" onclick="location.href='design_v3/index.html'">
+        <div class="card-preview" style="background:#fafafa;display:flex;align-items:center;justify-content:center">
+          <span class="card-badge">Концепция 3</span>
+          <div style="width:180px;background:#fff;border-radius:24px;box-shadow:0 8px 32px rgba(0,0,0,.12);overflow:hidden;border:1px solid #e2e8f0">
+            <div style="background:#6366f1;padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+              <span style="color:#fff;font-size:11px;font-weight:700">🧠 RAG Chat</span>
+              <span style="color:rgba(255,255,255,.7);font-size:9px">GPT-4o ▾</span>
+            </div>
+            <div style="padding:10px;display:flex;flex-direction:column;gap:6px;min-height:160px">
+              <div style="background:#f1f5f9;border-radius:12px 12px 12px 4px;padding:8px;font-size:9px;color:#475569">Привет! Загрузите документ.</div>
+              <div style="background:#6366f1;border-radius:12px 12px 4px 12px;padding:8px;font-size:9px;color:#fff;align-self:flex-end">Что в отчёте?</div>
+              <div style="background:#f1f5f9;border-radius:12px 12px 12px 4px;padding:8px;font-size:9px;color:#475569">В отчёте: ROI +24%...<br><span style="color:#6366f1">📄 стр. 12</span></div>
+            </div>
+            <div style="padding:8px;border-top:1px solid #e2e8f0;display:flex;gap:4px">
+              <div style="flex:1;background:#f8fafc;border-radius:20px;padding:6px 10px;font-size:9px;color:#94a3b8">Вопрос...</div>
+              <div style="background:#6366f1;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">➤</div>
+            </div>
+            <div style="display:flex;border-top:1px solid #e2e8f0">
+              <div style="flex:1;padding:8px;text-align:center;font-size:9px;color:#94a3b8">📄 Docs</div>
+              <div style="flex:1;padding:8px;text-align:center;font-size:9px;color:#6366f1;border-bottom:2px solid #6366f1">💬 Chat</div>
+              <div style="flex:1;padding:8px;text-align:center;font-size:9px;color:#94a3b8">⚙️ Settings</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Концепция 3 — Mobile Tab-based</div>
+          <div class="card-desc">Material Design 3, bottom navigation, полноэкранные вкладки. Оптимизирован для мобильных устройств.</div>
+          <div class="card-tags">
+            <span class="tag">Mobile-first</span>
+            <span class="tag">Tab Navigation</span>
+            <span class="tag">Material 3</span>
+          </div>
+          <span class="card-link">Открыть полный дизайн →</span>
+        </div>
+      </div>
+
+    </div>
+  `;
+  document.body.appendChild(section);
+
+  // User Stories section
+  const stories = document.createElement('div');
+  stories.className = 'section';
+  stories.style.borderTop = '1px solid var(--border)';
+  stories.innerHTML = `
+    <div class="section-title">User Story Map</div>
+    <div class="section-sub">9 историй · 3 приоритета · 3 персоны</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+      ${[
+        {p:'Must Have',color:'#10b981',stories:['US-01: Загрузка документа','US-02: Выбор LLM','US-03: Диалог с документом','US-04: История диалога']},
+        {p:'Should Have',color:'#f59e0b',stories:['US-05: Удаление документов','US-06: Выбор документов для поиска','US-07: Ввод API-ключа']},
+        {p:'Nice to Have',color:'#6366f1',stories:['US-08: Мобильный интерфейс','US-09: Просмотр источников']}
+      ].map(g=>`
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+          <div style="color:${g.color};font-size:12px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+            <span style="width:8px;height:8px;background:${g.color};border-radius:50%;display:inline-block"></span>${g.p}
+          </div>
+          ${g.stories.map(s=>`<div style="padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--muted);margin-bottom:6px">${s}</div>`).join('')}
+        </div>
+      `).join('')}
+    </div>
+  `;
+  document.body.appendChild(stories);
+});
+</script>
