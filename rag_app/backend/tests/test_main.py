@@ -18,5 +18,5 @@ def test_llm_providers():
     assert "providers" in data
 
 def test_upload_invalid_format():
-    response = client.post("/api/upload", files=[("file", ("test.txt", b"content"))])
+    response = client.post("/api/upload", files=[("file", ("test.exe", b"content"))])
     assert response.status_code == 400

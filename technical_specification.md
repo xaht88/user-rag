@@ -150,3 +150,35 @@ RAG (Retrieval-Augmented Generation) веб-приложение для рабо
 - [ ] Все ошибки обрабатываются с понятными сообщениями
 - [ ] Данные сессии изолированы и очищаются при закрытии
 - [ ] Время ответа ≤ 30 секунд на тестовых документах
+
+---
+
+## 8. Решения по реализации Frontend (утверждено)
+
+- **Frontend stack**: Next.js (App Router) + TypeScript + Tailwind CSS
+- **UI-концепция**: Split-Panel (`DocumentPanel` + `ChatPanel`) с мобильным fallback
+- **Интеграция с backend**:
+  - dev: frontend поднимается отдельно (`next dev`), backend (`uvicorn`)
+  - build: статика публикуется в `rag_app/backend/static/next`, template в `rag_app/backend/templates`
+- **Состояния интерфейса**: для каждого ключевого сценария должны быть реализованы `loading`, `error`, `success`
+
+### 8.1 Минимум 3 обязательные функции Frontend
+
+| ID | Функция | Критерий приемки |
+|----|---------|------------------|
+| FE-01 | Upload документов | Пользователь может загрузить `pdf/docx/txt/md`, увидеть прогресс и итоговый статус |
+| FE-02 | Chat с источниками | Ответ в чате отображается с источниками и состояниями `loading/error` |
+| FE-03 | Выбор LLM | Выбранный провайдер/модель применяется к запросу и отображается в интерфейсе |
+
+### 8.2 Структура frontend-слоев
+
+- `app/` — страницы и layout
+- `components/` — UI-компоненты (`AppLayout`, `DocumentPanel`, `ChatPanel`, `LLMSelector`, `SourceCard`)
+- `features/` — прикладная логика (`documents`, `chat`, `llm`)
+- `shared/` — api client, типы, утилиты
+
+### 8.3 Автотесты (минимальные)
+
+- Тест 1: `DocumentPanel` корректно показывает `loading/error/success`
+- Тест 2: `ChatPanel` отправляет сообщение и отображает ошибку при невалидном ответе
+- Тест 3: `LLMSelector` обновляет конфигурацию модели и передает ее в callback

@@ -10,6 +10,7 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+*.pytest_cache
 
 # Next.js
 .next/
@@ -21,6 +22,11 @@ out/
 .idea/
 *.swp
 *.swo
+*.codeassistant
+*.kiro
+*.continue
+*.cursor
+*.agents
 
 # OS
 .DS_Store

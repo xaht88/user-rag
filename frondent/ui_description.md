@@ -70,3 +70,34 @@
 5. `SourceCard` — карточка источника (имя файла, страница, релевантный фрагмент)
 
 Стиль: Tailwind CSS, цвет акцента `blue-600`, шрифт Inter, тёмная тема опционально.
+
+---
+
+## Техническая реализация UI (утверждено)
+
+- Framework: `Next.js` (App Router) + `TypeScript`
+- Styling: `Tailwind CSS`
+- Integration target:
+  - runtime API: `FastAPI` backend endpoints
+  - build output: публикация в `rag_app/backend/static/next` и `rag_app/backend/templates`
+
+### Состояния компонентов
+
+- `DocumentPanel`:
+  - `loading`: загрузка/парсинг документа
+  - `error`: ошибка формата/лимита/сети
+  - `success`: документ готов, видны чанки/страницы
+- `ChatPanel`:
+  - `loading`: индикатор ответа ассистента
+  - `error`: системное сообщение и действие повтора
+  - `success`: ответ и карточки источников
+- `LLMSelector`:
+  - `loading`: загрузка списка моделей
+  - `error`: провайдер недоступен
+  - `success`: модель выбрана и применена
+
+### Адаптивные правила
+
+- `>= 1024px`: классический split-panel, документы слева, чат справа
+- `768px - 1023px`: уплотненный split-panel, сокращенные метаданные
+- `< 768px`: переключение между документами и чатом через tab-bar/drawer
