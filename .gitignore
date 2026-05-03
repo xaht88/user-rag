@@ -38,3 +38,11 @@ Thumbs.db
 # Environment variables (если есть локальные файлы с секретами)
 .env.local
 .env.production
+
+# Vector Database
+chroma_db/
+*.sqlite
+*.db
+
+# Uploaded documents
+rag_app/backend/uploads/
