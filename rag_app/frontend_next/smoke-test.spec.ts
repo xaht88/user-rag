@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('RAG Chat Application Smoke Test', () => {
   test('should load the homepage', async ({ page }) => {
     // Navigate to the application
-    await page.goto('http://localhost:5177');
+    await page.goto('http://localhost:5173');
     
     // Wait for the page to load
     await page.waitForLoadState('networkidle');
@@ -16,7 +16,7 @@ test.describe('RAG Chat Application Smoke Test', () => {
   });
 
   test('should display chat interface elements', async ({ page }) => {
-    await page.goto('http://localhost:5177');
+    await page.goto('http://localhost:5173');
     await page.waitForLoadState('networkidle');
     
     // Check for chat input field
@@ -29,7 +29,7 @@ test.describe('RAG Chat Application Smoke Test', () => {
   });
 
   test('should handle user input in chat', async ({ page }) => {
-    await page.goto('http://localhost:5177');
+    await page.goto('http://localhost:5173');
     await page.waitForLoadState('networkidle');
     
     // Type a message
@@ -41,7 +41,7 @@ test.describe('RAG Chat Application Smoke Test', () => {
   });
 
   test('should display mock documents', async ({ page }) => {
-    await page.goto('http://localhost:5177');
+    await page.goto('http://localhost:5173');
     await page.waitForLoadState('networkidle');
     
     // Check for document list
