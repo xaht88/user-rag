@@ -1,0 +1,566 @@
+openapi: 3.0.3
+info:
+  title: RAG Chat Application API
+  description: |
+    REST API для RAG (Retrieval-Augmented Generation) чат-приложения.
+    
+    ## Overview
+    
+    Этот API предоставляет endpoints для:
+    - Загрузки документов (PDF, DOCX, TXT, MD)
+    - Управления сессиями чата
+    - Обработки запросов к документам с использованием LLM
+    - Хранения векторных представлений документов в ChromaDB
+    
+    ## Authentication
+    
+    ⚠️ **Внимание:** В текущей версии аутентификация не реализована.
+    Для продакшена необходимо реализовать JWT аутентификацию.
+    
+    ## Rate Limiting
+    
+    ⚠️ **Внимание:** Rate limiting не реализован.
+    
+  version: 1.0.0
+  contact:
+    name: Support
+    email: support@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8000
+    description: Development server
+  - url: https://api.example.com
+    description: Production server
+
+tags:
+  - name: Documents
+    description: Operations with documents
+  - name: Sessions
+    description: Session management
+  - name: Chat
+    description: Chat and query operations
+  - name: LLM
+    description: LLM configuration
+
+paths:
+  /:
+    get:
+      summary: Главная страница
+      description: Возвращает HTML главную страницу приложения
+      tags:
+        - General
+      responses:
+        '200':
+          description: HTML страница
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /api/upload:
+    post:
+      summary: Загрузить документ
+      description: |
+        Загружает документ в систему. Поддерживаемые форматы: PDF, DOCX, TXT, MD.
+        Максимальный размер файла: 50 MB.
+        
+        После загрузки документ начинает обрабатываться асинхронно.
+      tags:
+        - Documents
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Файл документа
+              required:
+                - file
+      responses:
+        '200':
+          description: Документ успешно загружен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponse'
+        '400':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            UnsupportedFormat:
+              summary: Неподдерживаемый формат
+              value:
+                detail: "Неподдерживаемый формат. Допустимые: PDF, DOCX, TXT, MD"
+            FileTooLarge:
+              summary: Файл слишком большой
+              value:
+                detail: "Файл превышает 50 МБ"
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/sessions/{session_id}/documents:
+    get:
+      summary: Получить список документов
+      description: Возвращает список документов для указанной сессии
+      tags:
+        - Sessions
+        - Documents
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: ID сессии
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Список документов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentsListResponse'
+        '404':
+          description: Сессия не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                SessionNotFound:
+                  summary: Сессия не найдена
+                  value:
+                    detail: "Сессия не найдена"
+
+  /api/sessions/{session_id}/documents/{doc_id}/toggle:
+    post:
+      summary: Переключить статус документа
+      description: Включает или выключает документ для поиска в ответах LLM
+      tags:
+        - Sessions
+        - Documents
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: ID сессии
+          schema:
+            type: string
+            format: uuid
+        - name: doc_id
+          in: path
+          required: true
+          description: ID документа
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Документ переключен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToggleResponse'
+        '404':
+          description: Документ или сессия не найдены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/sessions/{session_id}/documents/{doc_id}/delete:
+    post:
+      summary: Удалить документ
+      description: Удаляет документ из сессии и из файловой системы
+      tags:
+        - Sessions
+        - Documents
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: ID сессии
+          schema:
+            type: string
+            format: uuid
+        - name: doc_id
+          in: path
+          required: true
+          description: ID документа
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Документ удален
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+        '404':
+          description: Документ или сессия не найдены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/sessions/{session_id}/llm/config:
+    post:
+      summary: Настроить LLM
+      description: Обновляет конфигурацию LLM для указанной сессии
+      tags:
+        - LLM
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: ID сессии
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LLMConfig'
+      responses:
+        '200':
+          description: Конфигурация обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigResponse'
+        '404':
+          description: Сессия не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/sessions/{session_id}/query:
+    post:
+      summary: Отправить запрос
+      description: |
+        Отправляет запрос пользователем. Система использует RAG для поиска
+        релевантной информации в документах и генерирует ответ с помощью LLM.
+        
+        Если document_ids не указаны, используются все выбранные документы.
+      tags:
+        - Chat
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: ID сессии
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequest'
+      responses:
+        '200':
+          description: Ответ сгенерирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Ошибка валидации запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            NoDocuments:
+              summary: Нет загруженных документов
+              value:
+                detail: "Загрузите документ для начала работы"
+            NoSelectedDocuments:
+              summary: Нет выбранных документов
+              value:
+                detail: "Выберите хотя бы один документ"
+        '404':
+          description: Сессия не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/sessions/{session_id}/chat:
+    get:
+      summary: Получить историю чата
+      description: Возвращает историю сообщений для указанной сессии
+      tags:
+        - Chat
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: ID сессии
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: История чата
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatHistoryResponse'
+        '404':
+          description: Сессия не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/llm/providers:
+    get:
+      summary: Получить список провайдеров LLM
+      description: Возвращает список доступных провайдеров LLM и их модели
+      tags:
+        - LLM
+      responses:
+        '200':
+          description: Список провайдеров
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProvidersResponse'
+
+components:
+  schemas:
+    DocumentInfo:
+      type: object
+      description: Информация о документе
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор документа
+        filename:
+          type: string
+          description: Имя файла
+        upload_date:
+          type: string
+          format: date-time
+          description: Дата и время загрузки
+        chunks_count:
+          type: integer
+          description: Количество чанков (для векторного поиска)
+        pages_count:
+          type: integer
+          description: Количество страниц
+        status:
+          type: string
+          enum:
+            - processing
+            - ready
+            - error
+          description: Статус обработки документа
+        selected:
+          type: boolean
+          description: Выбран ли документ для поиска
+        filepath:
+          type: string
+          format: uri
+          description: Путь к файлу (внутреннее поле)
+
+    DocumentsListResponse:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentInfo'
+
+    UploadResponse:
+      type: object
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          description: ID созданной сессии
+        document_id:
+          type: string
+          format: uuid
+          description: ID загруженного документа
+        message:
+          type: string
+          description: Сообщение об успешной загрузке
+
+    ToggleResponse:
+      type: object
+      properties:
+        selected:
+          type: boolean
+          description: Новый статус документа
+
+    DeleteResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Сообщение об успешном удалении
+
+    LLMConfig:
+      type: object
+      description: Конфигурация LLM
+      properties:
+        provider:
+          type: string
+          enum:
+            - openai
+            - ollama
+          description: Провайдер LLM
+        model:
+          type: string
+          description: Название модели
+        api_key:
+          type: string
+          format: password
+          description: API ключ (опционально)
+
+    ConfigResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Сообщение об успешном обновлении
+
+    QueryRequest:
+      type: object
+      description: Запрос к LLM
+      properties:
+        query:
+          type: string
+          description: Текст запроса пользователя
+        session_id:
+          type: string
+          format: uuid
+          description: ID сессии (дублируется из path для удобства)
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: ID документов для поиска (опционально)
+
+    Source:
+      type: object
+      description: Источник информации
+      properties:
+        filename:
+          type: string
+          description: Имя файла источника
+        page:
+          type: integer
+          description: Номер страницы
+        snippet:
+          type: string
+          description: Релевантный фрагмент текста
+
+    ChatMessage:
+      type: object
+      description: Сообщение чата
+      properties:
+        role:
+          type: string
+          enum:
+            - user
+            - assistant
+          description: Роль отправителя
+        content:
+          type: string
+          description: Текст сообщения
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Source'
+          description: Источники информации (для assistant)
+
+    QueryResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Ответ LLM
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Source'
+          description: Источники ответа
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+          description: Обновленная история чата
+
+    ChatHistoryResponse:
+      type: object
+      properties:
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+
+    LLMProvider:
+      type: object
+      description: Провайдер LLM
+      properties:
+        name:
+          type: string
+          description: Название провайдера
+        models:
+          type: array
+          items:
+            type: string
+          description: Список доступных моделей
+
+    ProvidersResponse:
+      type: object
+      properties:
+        providers:
+          type: array
+          items:
+            $ref: '#/components/schemas/LLMProvider'
+
+    ErrorResponse:
+      type: object
+      description: Ответ об ошибке
+      properties:
+        detail:
+          type: string
+          description: Описание ошибки
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - bearerAuth: []
