@@ -1,64 +1,124 @@
-# RAG Frontend Homework
+# RAG Chat Application
 
-## Описание
+Full-stack web application for document-based Q&A using Retrieval-Augmented Generation (RAG) architecture.
 
-Репозиторий содержит backend (`FastAPI`) и frontend-часть ДЗ на `Next.js + Tailwind CSS` для сценария RAG-приложения.
+## Overview
 
-## Структура
+Enable users to upload documents and perform intelligent queries using LLMs with context-aware responses and source citations.
 
-- `rag_app/backend` — API, шаблоны и статика
-- `rag_app/frontend_next` — frontend source of truth
-- `stories` — user stories
-- `technical_specification.md` — техническое задание
-- `frontend_specification.md` — спецификация frontend-реализации
+**Status:** Development Phase — In-memory session storage, mock LLM responses
 
-## Запуск локально
+---
 
-### Backend
+## Quick Start
+
+### Prerequisites
+
+- **Backend:** Python 3.10+, pip
+- **Frontend:** Node.js 18+, npm 9+
+
+### Running the Application
 
 ```bash
+# Terminal 1: Start Backend
 cd rag_app/backend
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+# or source .venv/bin/activate  # macOS/Linux
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
-```
 
-### Frontend
-
-```bash
+# Terminal 2: Start Frontend
 cd rag_app/frontend_next
 npm install
-npm run dev
+npm run dev  # Runs on http://localhost:5173
 ```
 
-Frontend: `http://localhost:3000`  
-Backend API: `http://localhost:8000`
+### Access Points
 
-## Тесты
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:8000
+- **API Docs:** http://localhost:8000/docs
+
+---
+
+## Technology Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | Vite 8.0.10, React 18, TypeScript, Tailwind CSS |
+| Backend | FastAPI, Python 3.10+, Pydantic, Uvicorn |
+| Vector DB | ChromaDB |
+| LLM | OpenAI API, Ollama |
+
+---
+
+## Testing
 
 ```bash
+# Frontend Unit Tests
 cd rag_app/frontend_next
 npm run test
+
+# Frontend E2E Tests (Playwright)
+npx playwright test
+npx playwright test --reporter=html
+
+# Backend Tests
+cd rag_app/backend
+pytest tests/ -v
 ```
 
-В проекте добавлены тесты:
-- `components/document-panel.test.tsx`
-- `components/chat-panel.test.tsx`
-- `components/llm-selector.test.tsx`
+---
 
-## Build и интеграция в FastAPI static/templates
+## Build for Backend Integration
 
 ```bash
 cd rag_app/frontend_next
 npm run export:backend
 ```
 
-Команда экспортирует артефакты в:
-- `rag_app/backend/static/next`
-- `rag_app/backend/templates/next_index.html`
+This exports static assets to `rag_app/backend/static/next` and template to `rag_app/backend/templates/next_index.html`.
 
-## Артефакты сдачи
+---
 
-- Код проекта в репозитории
-- README с инструкциями
-- `development_report.md` с описанием процесса
-- Автотесты (>= 3) в репозитории
+## Documentation
+
+- [System Architecture](docs/architecture/system-overview.md)
+- [API Documentation](docs/api/README.md)
+- [Development Guide](docs/development/README.md)
+- [Deployment Guide](docs/deployment/README.md)
+- [Architecture Decision Records](docs/decisions/README.md)
+- [Agent Instructions](docs/instructions/README.md)
+
+---
+
+## Project Structure
+
+```
+otus_dz2/
+├── rag_app/
+│   ├── backend/                    # FastAPI backend
+│   └── frontend_next/              # Vite + React frontend
+├── docs/                           # Documentation
+├── stories/                        # User stories
+├── .agents/                        # Agent instructions
+├── AGENTS.md                       # AI agent instructions
+├── README.md                       # This file
+└── technical_specification.md      # Technical requirements
+```
+
+---
+
+## Known Issues & Technical Debt
+
+1. **In-Memory Session Storage** — Sessions lost on restart
+2. **Mock LLM Responses** — Real LLM integration pending
+3. **No Authentication** — JWT authentication planned
+4. **No Rate Limiting** — API can be abused
+
+---
+
+**Generated with [Continue](https://continue.dev)**
+
+Co-Authored-By: Continue <noreply@continue.dev>

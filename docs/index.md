@@ -64,6 +64,21 @@ pytest tests/ -v
 | [Development Guide](./development/README.md) | `docs/development/README.md` | Development setup and workflow |
 | [Deployment Guide](./deployment/README.md) | `docs/deployment/README.md` | Production deployment instructions |
 
+### 🛠️ Agent Instructions
+
+| Document | Location | Description |
+|----------|----------|-------------|
+| [Instructions Index](./instructions/README.md) | `docs/instructions/README.md` | Index of all agent guidelines |
+| [TypeScript Conventions](./instructions/typescript.md) | `docs/instructions/typescript.md` | TypeScript patterns and best practices |
+| [Python Conventions](./instructions/python.md) | `docs/instructions/python.md` | Python backend guidelines |
+| [Code Style](./instructions/code-style.md) | `docs/instructions/code-style.md` | Code formatting and style rules |
+| [Testing Guidelines](./instructions/testing.md) | `docs/instructions/testing.md` | Testing strategy (Vitest, Playwright, pytest) |
+| [Git Workflow](./instructions/git-workflow.md) | `docs/instructions/git-workflow.md` | Git branching and commit conventions |
+| [Architecture Patterns](./instructions/architecture.md) | `docs/instructions/architecture.md` | Design patterns and architecture decisions |
+| [Security Guidelines](./instructions/security.md) | `docs/instructions/security.md` | Security best practices |
+| [Development Workflow](./instructions/development-workflow.md) | `docs/instructions/development-workflow.md` | Development process and tools |
+| [Documentation Standards](./instructions/documentation.md) | `docs/instructions/documentation.md` | Documentation conventions |
+
 ### 🏗️ Architecture Decision Records
 
 | ADR | Title | Status |
