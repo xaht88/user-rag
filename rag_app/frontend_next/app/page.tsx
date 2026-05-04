@@ -8,7 +8,7 @@ import { LLMSelector } from "../components/llm-selector";
 import { initialMessages } from "../features/chat/mock-messages";
 import { mockDocuments } from "../features/documents/mock-documents";
 import { defaultLlmConfig } from "../features/llm/default-config";
-import { updateLlmConfig } from "../shared/api/client";
+import { apiClient } from "../shared/api/client";
 import type { ChatMessage, LlmConfig, ViewState } from "../shared/types";
 
 const DEMO_SESSION_ID = "demo-session";
@@ -53,7 +53,7 @@ export default function HomePage() {
     setLlmConfig(nextConfig);
     setLlmState("loading");
     try {
-      await updateLlmConfig(DEMO_SESSION_ID, nextConfig);
+      await apiClient.updateLlmConfig(DEMO_SESSION_ID, nextConfig);
       setLlmState("success");
     } catch {
       setLlmState("error");

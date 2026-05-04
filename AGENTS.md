@@ -20,6 +20,7 @@
 | Backend API | http://localhost:8000 | FastAPI REST API |
 | API Docs | http://localhost:8000/docs | Swagger UI |
 | ReDoc | http://localhost:8000/redoc | Alternative API docs |
+| Test Report | ./rag_app/frontend_next/playwright-report/ | Playwright HTML report |
 
 ### Technology Stack
 
@@ -66,9 +67,15 @@ npm run dev  # Runs on http://localhost:5173
 **Frontend:**
 ```bash
 cd rag_app/frontend_next
-npm run test          # Run tests
+npm run test          # Run Vitest unit tests
 npm run test:watch    # Watch mode
 npm run test:coverage # With coverage
+
+# E2E Testing with Playwright
+npx playwright test           # Run all tests
+npx playwright test smoke-test.spec.ts  # Run smoke tests
+npx playwright test --reporter=html     # Generate HTML report
+npx playwright show-report  # Open HTML report
 ```
 
 **Backend:**

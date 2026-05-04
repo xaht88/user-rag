@@ -1,24 +1,23 @@
 // rag_app/frontend_next/shared/api/client.ts
 import { QueryRequest, QueryResponse, LlmConfig, DocumentItem } from '../shared/types';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const apiClient = {
-  async queryLLM(request: QueryRequest): Promise<QueryResponse> {
-    const res = await fetch(`${BASE_URL}/query_llm`, {
+  async queryLLM(sessionId: string, query: string, documentIds?: string[]): Promise<QueryResponse> {
+    const res = await fetch(`${BASE_URL}/api/sessions/${sessionId}/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(request),
+      body: JSON.stringify({ session_id: sessionId, query, document_ids: documentIds }),
     });
     if (!res.ok) throw new Error(`API Error: ${res.status}`);
     return res.json();
   },
 
-  async uploadDocument(file: File, sessionId: string): Promise<{ doc_id: string; status: string }> {
+  async uploadDocument(file: File, sessionId: string): Promise<{ session_id: string; document_id: string }> {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('session_id', sessionId);
-    const res = await fetch(`${BASE_URL}/upload_document`, {
+    const res = await fetch(`${BASE_URL}/api/upload`, {
       method: 'POST',
       body: formData,
     });
@@ -27,28 +26,35 @@ export const apiClient = {
   },
 
   async getDocuments(sessionId: string): Promise<DocumentItem[]> {
-    const res = await fetch(`${BASE_URL}/get_documents?session_id=${sessionId}`);
+    const res = await fetch(`${BASE_URL}/api/sessions/${sessionId}/documents`);
     if (!res.ok) throw new Error(`Docs Error: ${res.status}`);
-    return res.json();
+    const data = await res.json();
+    return data.documents || [];
   },
 
-  async setLlmConfig(sessionId: string, config: LlmConfig): Promise<{ status: string }> {
-    const res = await fetch(`${BASE_URL}/set_llm_config`, {
+  async updateLlmConfig(sessionId: string, config: LlmConfig): Promise<{ message: string }> {
+    const res = await fetch(`${BASE_URL}/api/sessions/${sessionId}/llm/config`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ session_id: sessionId, config }),
+      body: JSON.stringify(config),
     });
     if (!res.ok) throw new Error(`Config Error: ${res.status}`);
     return res.json();
   },
 
-  async deleteDocument(sessionId: string, docId: string): Promise<{ status: string }> {
-    const res = await fetch(`${BASE_URL}/delete_document`, {
+  async deleteDocument(sessionId: string, docId: string): Promise<{ message: string }> {
+    const res = await fetch(`${BASE_URL}/api/sessions/${sessionId}/documents/${docId}/delete`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ session_id: sessionId, doc_id: docId }),
     });
     if (!res.ok) throw new Error(`Delete Error: ${res.status}`);
+    return res.json();
+  },
+
+  async toggleDocument(sessionId: string, docId: string): Promise<{ selected: boolean }> {
+    const res = await fetch(`${BASE_URL}/api/sessions/${sessionId}/documents/${docId}/toggle`, {
+      method: 'POST',
+    });
+    if (!res.ok) throw new Error(`Toggle Error: ${res.status}`);
     return res.json();
   },
 };

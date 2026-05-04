@@ -1,160 +1,275 @@
-# RAG Chat Application — Документация
+# RAG Chat Application - Documentation Index
 
-## 📚 О проекте
+## Overview
 
-**RAG Chat Application** — Full-stack веб-приложение для работы с документами на основе Retrieval-Augmented Generation (RAG).
+**RAG Chat Application** — Full-stack web application for document-based Q&A using Retrieval-Augmented Generation (RAG) architecture.
 
-**Основное назначение:**
-- Загрузка документов (PDF, DOCX, TXT, MD)
-- Интеллектуальный поиск и ответы на вопросы по загруженным документам
-- Контекстно-зависимые ответы с указанием источников
+**Purpose:** Enable users to upload documents and perform intelligent queries using LLMs with context-aware responses and source citations.
 
-## 🗂 Структура документации
+**Status:** Development Phase — In-memory session storage, mock LLM responses
 
-### [API](./api/README.md)
-- OpenAPI спецификация
-- Endpoints для работы с документами, сессиями и чатом
-- Форматы запросов и ответов
+---
 
-### [Архитектура](./architecture/README.md)
-- Обзор системы
-- Компоненты и их взаимодействие
-- Поток данных
+## Quick Start
 
-### [Разработка](./development/README.md)
-- Настройка окружения
-- Запуск разработки
-- Тестирование
-- Линтинг и форматирование
+### Prerequisites
 
-### [Развёртывание](./deployment/README.md)
-- Production окружение
-- Docker конфигурация
-- Мониторинг и логирование
+- **Backend:** Python 3.10+, pip
+- **Frontend:** Node.js 18+, npm 9+
+- **Testing:** Playwright (for E2E tests)
 
-### [ADR (Architecture Decision Records)](./decisions/README.md)
-- Архитектурные решения проекта
+### Running the Application
 
-## 🚀 Быстрый старт
-
-### Установка
-
-**Backend:**
 ```bash
+# Terminal 1: Start Backend
 cd rag_app/backend
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+# or source .venv/bin/activate  # macOS/Linux
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
-```
 
-**Frontend:**
-```bash
+# Terminal 2: Start Frontend
 cd rag_app/frontend_next
 npm install
 npm run dev  # Runs on http://localhost:5173
 ```
 
-### Доступ
+### Running Tests
 
-- **Frontend:** http://localhost:5173
-- **Backend API:** http://localhost:8000
-- **API Docs:** http://localhost:8000/docs (Swagger UI)
-
-## 📋 Основные команды
-
-| Команда | Описание |
-|---------|----------|
-| `npm run dev` | Запуск frontend в режиме разработки |
-| `uvicorn main:app --reload` | Запуск backend в режиме разработки |
-| `npm run test` | Запуск тестов (frontend) |
-| `pytest tests/` | Запуск тестов (backend) |
-| `npm run lint` | Проверка кода (ESLint) |
-| `npm run export:backend` | Экспорт frontend для интеграции с backend |
-
-## 🏗 Архитектура
-
-```
-┌─────────────┐         ┌──────────────┐
-│   Vite +    │         │   FastAPI    │
-│   React     │◄───────►│    Backend   │
-│  (5173)     │  HTTP   │   (8000)     │
-└─────────────┘  API    └──────────────┘
-                               │
-                    ┌──────────┴──────────┐
-                    │                     │
-              ┌─────▼─────┐       ┌──────▼─────┐
-              │ ChromaDB  │       │   Ollama   │
-              │ (Vectors) │       │   /OpenAI  │
-              └───────────┘       └────────────┘
-```
-
-## 🔑 Ключевые файлы
-
-### Backend
-- `rag_app/backend/main.py` — API endpoints
-- `rag_app/backend/rag_engine.py` — RAG логика (эмбеддинги, поиск)
-- `rag_app/backend/requirements.txt` — Python зависимости
-- `rag_app/backend/uploads/` — Хранилище загруженных документов
-- `rag_app/backend/chroma_db/` — ChromaDB векторное хранилище
-
-### Frontend
-- `rag_app/frontend_next/app/page.tsx` — Главная страница (чат)
-- `rag_app/frontend_next/shared/api/client.ts` — API клиент
-- `rag_app/frontend_next/shared/types.ts` — TypeScript типы
-- `rag_app/frontend_next/components/` — React компоненты
-
-## 🧪 Тестирование
-
-### Frontend (Vitest)
 ```bash
+# Frontend Unit Tests
 cd rag_app/frontend_next
 npm run test
-```
 
-**Тесты:**
-- `components/document-panel.test.tsx`
-- `components/chat-panel.test.tsx`
-- `components/llm-selector.test.tsx`
+# Frontend E2E Tests (Playwright)
+npx playwright test
+npx playwright test --reporter=html
 
-### Backend (pytest)
-```bash
+# Backend Tests
 cd rag_app/backend
-pytest tests/
+pytest tests/ -v
 ```
 
-## 🔧 Конфигурация
+---
 
-### Переменные окружения
+## Documentation Structure
 
-Создайте `.env` файл:
+### 📚 Core Documentation
+
+| Document | Location | Description |
+|----------|----------|-------------|
+| [System Architecture](./architecture/system-overview.md) | `docs/architecture/system-overview.md` | Complete architecture overview |
+| [API Documentation](./api/README.md) | `docs/api/README.md` | Complete API reference |
+| [Development Guide](./development/README.md) | `docs/development/README.md` | Development setup and workflow |
+| [Deployment Guide](./deployment/README.md) | `docs/deployment/README.md` | Production deployment instructions |
+
+### 🏗️ Architecture Decision Records
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| [ADR-001](./decisions/ADR-001-client-server.md) | Client-Server Architecture Pattern | Accepted |
+| [ADR-002](./decisions/ADR-002-session-management.md) | Session Management Strategy | Accepted |
+
+### 📖 Technical Specifications
+
+| Document | Location | Description |
+|----------|----------|-------------|
+| [Technical Specification](../technical_specification.md) | `../technical_specification.md` | Technical requirements |
+| [Frontend Specification](../frontend_specification.md) | `../frontend_specification.md` | Frontend-specific requirements |
+| [User Stories](../stories/user_stories.md) | `../stories/user_stories.md` | User stories and use cases |
+
+---
+
+## Project Structure
+
+```
+otus_dz2/
+├── rag_app/
+│   ├── backend/                    # FastAPI backend
+│   │   ├── main.py                 # API entry point, REST endpoints
+│   │   ├── rag_engine.py           # RAG core logic (embeddings, retrieval)
+│   │   ├── requirements.txt        # Python dependencies
+│   │   ├── .env                    # Environment variables
+│   │   ├── uploads/                # Uploaded documents storage
+│   │   ├── chroma_db/              # ChromaDB vector store
+│   │   ├── static/                 # Static assets
+│   │   ├── templates/              # HTML templates
+│   │   └── tests/                  # Backend tests
+│   │
+│   └── frontend_next/              # Vite + React frontend
+│       ├── app/                    # React pages
+│       ├── components/             # React components
+│       ├── features/               # Feature modules
+│       ├── shared/                 # Shared types, API client
+│       ├── smoke-test.spec.ts      # Playwright smoke tests
+│       ├── playwright.config.ts    # Playwright configuration
+│       ├── vite.config.ts          # Vite configuration
+│       ├── package.json            # Node dependencies
+│       └── tsconfig.json           # TypeScript config
+│
+├── docs/                           # Documentation
+│   ├── index.md                    # This file
+│   ├── api/                        # API documentation
+│   ├── architecture/               # Architecture docs
+│   ├── development/                # Development guide
+│   ├── deployment/                 # Deployment guide
+│   └── decisions/                  # Architecture Decision Records
+│
+├── stories/                        # User stories
+│   ├── README.md
+│   └── user_stories.md
+├── technical_specification.md      # Technical requirements
+├── frontend_specification.md       # Frontend specs
+├── AGENTS.md                       # AI agent instructions
+└── README.md                       # Project README
+```
+
+---
+
+## API Endpoints
+
+### Document Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/upload` | Upload document (PDF, DOCX, TXT, MD) |
+| GET | `/api/sessions/{session_id}/documents` | List documents in session |
+| POST | `/api/sessions/{session_id}/documents/{doc_id}/toggle` | Toggle document selection |
+| POST | `/api/sessions/{session_id}/documents/{doc_id}/delete` | Delete document |
+
+### LLM Configuration
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/sessions/{session_id}/llm/config` | Configure LLM for session |
+| GET | `/api/llm/providers` | List available LLM providers |
+
+### Query & Chat
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/sessions/{session_id}/query` | Send query to LLM |
+| GET | `/api/sessions/{session_id}/chat` | Get chat history |
+
+**Full API Documentation:** http://localhost:8000/docs
+
+---
+
+## Environment Variables
+
+### Backend (.env)
 
 ```env
 OPENAI_API_KEY=your_openai_api_key
 OLLAMA_BASE_URL=http://localhost:11434
+PORT=8000
+DEBUG=true
 ```
 
-### Поддерживаемые форматы
+### Frontend (.env.local)
 
-- PDF
-- DOCX
-- TXT
-- MD
-
-**Максимальный размер файла:** 50 MB
-
-## ⚠️ Известные ограничения
-
-- In-memory хранение сессий (не для production)
-- Mock LLM ответы (реализация в разработке)
-- Асинхронная обработка документов (симулирована)
-- Нет аутентификации (требуется для production)
-
-## 📝 Лицензия
-
-MIT
+```env
+VITE_API_URL=http://localhost:8000
+VITE_OPENAI_API_KEY=your_openai_api_key
+VITE_OLLAMA_BASE_URL=http://localhost:11434
+```
 
 ---
 
-**Следующие шаги:**
-1. Прочитайте [Technical Specification](../technical_specification.md) для требований
-2. Изучите [Frontend Specification](../frontend_specification.md) для frontend деталей
-3. Ознакомьтесь с [User Stories](../stories/user_stories.md) для сценариев использования
+## Testing
+
+### Frontend Testing
+
+**Unit Tests (Vitest):**
+```bash
+npm run test          # Run all tests
+npm run test:watch    # Watch mode
+npm run test:coverage # With coverage report
+```
+
+**E2E Tests (Playwright):**
+```bash
+npx playwright test           # Run all tests
+npx playwright test smoke-test.spec.ts  # Run smoke tests
+npx playwright test --reporter=html     # Generate HTML report
+npx playwright show-report  # Open HTML report
+```
+
+### Backend Testing
+
+```bash
+pytest tests/ -v
+pytest tests/ --cov=. --cov-report=html  # With coverage
+```
+
+---
+
+## Known Issues & Technical Debt
+
+### Current Limitations
+
+1. **In-Memory Session Storage**
+   - Sessions lost on server restart
+   - No horizontal scaling
+   - **Solution:** Migrate to PostgreSQL + Redis
+
+2. **Mock LLM Responses**
+   - Real LLM integration pending
+   - **Solution:** Implement real OpenAI/Ollama calls
+
+3. **No Authentication**
+   - No user authentication or authorization
+   - **Solution:** Implement JWT authentication
+
+4. **No Rate Limiting**
+   - API can be abused
+   - **Solution:** Implement rate limiting middleware
+
+5. **Document Processing**
+   - Asynchronous processing is simulated
+   - **Solution:** Implement real async task queue (Celery)
+
+---
+
+## Future Roadmap
+
+### Phase 1: Production Readiness
+
+- [ ] Add PostgreSQL for session storage
+- [ ] Implement JWT authentication
+- [ ] Add Redis for caching
+- [ ] Implement rate limiting
+- [ ] Add comprehensive logging
+
+### Phase 2: Scalability
+
+- [ ] Containerize with Docker
+- [ ] Kubernetes deployment
+- [ ] Load balancing
+- [ ] Database connection pooling
+- [ ] Horizontal scaling
+
+### Phase 3: Advanced Features
+
+- [ ] Vector database clustering
+- [ ] LLM model caching
+- [ ] Async task queue (Celery)
+- [ ] Real-time updates (WebSocket)
+- [ ] Multi-tenancy support
+
+---
+
+## References
+
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [Vite Documentation](https://vitejs.dev/)
+- [React Documentation](https://react.dev/)
+- [ChromaDB Documentation](https://docs.trychroma.com/)
+- [Ollama Documentation](https://github.com/ollama/ollama)
+- [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
+
+---
+
+**Last Updated:** 2026-05-04  
+**Version:** 1.0.0
