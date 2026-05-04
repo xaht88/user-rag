@@ -1,0 +1,41 @@
+{
+  "track_id": "TD-001",
+  "title": "Persistent Session Storage",
+  "type": "technical_debt",
+  "status": "in_progress",
+  "priority": "high",
+  "assignee": null,
+  "created_at": "2026-05-04T21:02:00Z",
+  "updated_at": "2026-05-04T21:02:00Z",
+  "due_date": "2026-05-11T23:59:59Z",
+  "estimated_hours": 24,
+  "actual_hours": 0,
+  "dependencies": ["TD-003"],
+  "blocked_by": [],
+  "labels": ["backend", "database", "postgresql", "sessions", "persistence"],
+  "epic": "Production Readiness",
+  "description": "Migrate from in-memory session storage to PostgreSQL for persistence, horizontal scaling, and production readiness.",
+  "acceptance_criteria": [
+    "Sessions persist after backend restart",
+    "Session data isolated (one session inaccessible to another)",
+    "Automatic cleanup of old sessions (>30 days)",
+    "Support for horizontal scaling (multiple backend instances)",
+    "Unit tests for session storage with coverage >80%",
+    "Documentation updated"
+  ],
+  "files": {
+    "spec": "spec.md",
+    "plan": "plan.md",
+    "index": "index.md"
+  },
+  "links": {
+    "adr": "../../../docs/decisions/ADR-002-session-management.md",
+    "main_registry": "../../tracks.md"
+  },
+  "metrics": {
+    "test_coverage_target": 80,
+    "test_coverage_current": 0,
+    "query_latency_target_ms": 10,
+    "query_latency_current_ms": null
+  }
+}

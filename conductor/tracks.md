@@ -9,11 +9,11 @@ Registry всех work units (фичи, багфиксы, технический
 | Статус | Количество |
 |--------|------------|
 | 🔄 In Progress | 1 |
-| ⏳ Planned | 3 |
+| ⏳ Planned | 4 |
 | ✅ Completed | 0 |
 | 🚫 Blocked | 0 |
 
-**Всего tracks:** 4
+**Всего tracks:** 5
 
 ---
 

@@ -1,6 +1,7 @@
 {
   "version": "1.0.0",
   "initialized_at": "2026-05-04T21:02:00Z",
+  "updated_at": "2026-05-04T21:43:00Z",
   "project": {
     "name": "RAG Chat Application",
     "type": "brownfield",
@@ -12,18 +13,25 @@
     "tech-stack.md",
     "workflow.md",
     "tracks.md",
+    "setup_state.json",
     "code_styleguides/python.md",
     "code_styleguides/typescript.md"
   ],
   "tracks_initialized": [
+    "TD-001-persistent-sessions",
+    "TD-002-real-llm-integration",
+    "TD-003-jwt-authentication",
+    "TD-004-api-rate-limiting",
+    "FE-001-frontend-unit-test-coverage"
+  ],
+  "tracks_with_full_specs": [
     "TD-001-persistent-sessions"
   ],
   "next_steps": [
-    "Create detailed spec.md for each track",
-    "Create plan.md for each track",
-    "Initialize remaining tracks (TD-002, TD-003, TD-004)",
+    "Create spec.md and plan.md for TD-002, TD-003, TD-004, FE-001",
     "Add code styleguides for other languages if needed",
-    "Configure CI/CD for context validation"
+    "Configure CI/CD for context validation",
+    "Start implementation of TD-001"
   ],
   "validation": {
     "product_context": true,
