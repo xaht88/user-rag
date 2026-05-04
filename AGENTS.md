@@ -52,8 +52,8 @@ pytest rag_app/backend/tests/ -v
 For specific guidelines, see:
 
 ### Code & Style
-- [TypeScript Conventions](docs/instructions/typescript.md)
-- [Python Conventions](docs/instructions/python.md)
+- [Python Styleguide](conductor/code_styleguides/python.md)
+- [TypeScript Styleguide](conductor/code_styleguides/typescript.md)
 - [Code Style](docs/instructions/code-style.md)
 
 ### Testing
@@ -64,6 +64,7 @@ For specific guidelines, see:
 - [Security Guidelines](docs/instructions/security.md)
 
 ### Workflow
+- [Workflow](conductor/workflow.md)
 - [Git Workflow](docs/instructions/git-workflow.md)
 - [Development Workflow](docs/instructions/development-workflow.md)
 
@@ -76,6 +77,18 @@ For specific guidelines, see:
 
 ```
 otus_dz2/
+├── conductor/                      # Context artifacts (CDD)
+│   ├── index.md                    # Navigation hub
+│   ├── product.md                  # Product vision & goals
+│   ├── tech-stack.md               # Technology preferences
+│   ├── workflow.md                 # Development practices
+│   ├── tracks.md                   # Work unit registry
+│   ├── setup_state.json            # Setup state
+│   ├── code_styleguides/           # Language conventions
+│   │   ├── python.md
+│   │   └── typescript.md
+│   └── tracks/                     # Track directories
+│       └── TD-001-persistent-sessions/
 ├── rag_app/
 │   ├── backend/                    # FastAPI backend
 │   └── frontend_next/              # Vite + React frontend
@@ -100,6 +113,14 @@ otus_dz2/
 
 ## Documentation Index
 
+### Context Artifacts (CDD)
+- [Conductor Index](conductor/index.md)
+- [Product Vision](conductor/product.md)
+- [Tech Stack](conductor/tech-stack.md)
+- [Workflow](conductor/workflow.md)
+- [Tracks Registry](conductor/tracks.md)
+
+### Architecture & API
 - [System Architecture](docs/architecture/system-overview.md)
 - [API Documentation](docs/api/README.md)
 - [Development Guide](docs/development/README.md)
