@@ -46,6 +46,7 @@
 | TD-002 | Real LLM Integration | ⏳ Planned | 🔴 High |
 | TD-003 | JWT Authentication | ⏳ Planned | 🔴 High |
 | TD-004 | API Rate Limiting | ⏳ Planned | 🟡 Medium |
+| FE-001 | Frontend Unit Test Coverage | ⏳ Planned | 🟢 Low |
 
 👉 Подробнее: [tracks.md](./tracks.md)
 
@@ -65,5 +66,5 @@
 
 ---
 
-**Последнее обновление:** 2026-05-04  
-**Версия контекста:** 1.0.0
+**Последнее обновление:** 2026-05-08  
+**Версия контекста:** 1.1.0

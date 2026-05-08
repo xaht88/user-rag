@@ -343,5 +343,5 @@ kubectl rollout status deployment/rag-app
 
 ---
 
-**Последнее обновление:** 2026-05-04  
-**Версия workflow:** 1.0.0
+**Последнее обновление:** 2026-05-08  
+**Версия workflow:** 1.1.0 (TD-001 cleanup in progress)

@@ -552,5 +552,28 @@ If issues occur:
 
 ---
 
-**Last Updated:** 2026-05-04  
-**Version:** 1.0.0
+## Recent Updates
+
+### 2026-05-08: ChromaDB Cleanup Complete
+
+**Выполнено:**
+- ✅ Удалены артефакты ChromaDB (rag_engine.py, chroma_db/, test_paths.py)
+- ✅ Обновлен requirements.txt (chromadb удален)
+- ✅ Обновлен README.md (документация для Supabase)
+- ✅ Коммиты созданы и отправлены в GIT
+
+**Текущий статус:**
+- Миграция с ChromaDB на Supabase завершена на уровне файлов
+- Требуется Python 3.10-3.12 для совместимости с пакетами Supabase
+- pyiceberg требует компиляции C-расширений
+
+**Next Steps:**
+- Установить Python 3.10-3.12
+- Настроить Supabase project
+- Создать миграции для PostgreSQL
+- Реализовать PostgreSQLSessionStore
+
+---
+
+**Last Updated:** 2026-05-08  
+**Version:** 1.1.0
