@@ -66,12 +66,9 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 backend/
 ├── main.py                              # Основной файл приложения, API endpoints
-├── rag_engine.py                        # [DEPRECATED] Старый RAG движок с ChromaDB
-├── rag_app.py                           # RAG логика: эмбеддинги, поиск, генерация ответов
 ├── requirements.txt                     # Python зависимости
 ├── .env                                 # Конфигурация окружения (не коммитить)
 ├── uploads/                             # Папка для загруженных документов
-├── chroma_db/                           # [DEPRECATED] Старая база ChromaDB
 ├── static/                              # Статические файлы (для экспорта frontend)
 ├── templates/                           # HTML шаблоны
 ├── services/                            # Сервисы (auth, storage, vector_store)
