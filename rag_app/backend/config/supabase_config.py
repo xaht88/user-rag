@@ -8,7 +8,7 @@ Environment variables required:
 '''
 
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 from httpx import Client, Timeout
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
@@ -237,7 +237,7 @@ class BucketReference:
         response.raise_for_status()
         return response.content
     
-    def remove(self, paths: list[str]) -> Dict[str, Any]:
+    def remove(self, paths: List[str]) -> Dict[str, Any]:
         '''Delete files from bucket.'''
         client = self.client._get_client()
         response = client.delete(

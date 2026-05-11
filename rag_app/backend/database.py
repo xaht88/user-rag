@@ -47,3 +47,12 @@ def get_db() -> Generator:
         yield db
     finally:
         db.close()
+
+# SQLite engine for testing (only when TEST_MODE is set)
+if os.getenv("TEST_MODE", "false").lower() == "true":
+    test_engine = create_engine(
+        "sqlite:///./test_rag_app.db",
+        connect_args={"check_same_thread": False},
+        echo=os.getenv("DEBUG", "false").lower() == "true",
+    )
+    TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)

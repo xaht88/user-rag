@@ -32,15 +32,19 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Инициализация FastAPI
+# Database initialization
+from database import engine, Base
+
+# Константы
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# Инициализация FastAPI с lifespan
 app = FastAPI(
     title="RAG Chat Application",
     version="2.0.0",
     description="Production-ready RAG application with Supabase integration"
 )
-
-# Database initialization
-from database import engine, Base
 
 # CORS middleware
 app.add_middleware(
@@ -50,10 +54,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Константы
-UPLOAD_DIR = "uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # Зависимости
 security = HTTPBearer()
@@ -687,13 +687,8 @@ async def lifespan(app: FastAPI):
     stop_scheduler()
     logger.info("Database cleanup complete")
 
-app = FastAPI(
-    title="RAG Chat Application",
-    version="2.0.0",
-    description="Production-ready RAG application with Supabase integration",
-    lifespan=lifespan
-)
-
+# Add lifespan to existing app
+app.router.lifespan_context = lifespan
 
 if __name__ == "__main__":
     import uvicorn
