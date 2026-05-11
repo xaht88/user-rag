@@ -5,10 +5,11 @@ from typing import Optional
 from uuid import uuid4
 from sqlalchemy import Column, String, Text, DateTime, Boolean, Integer, Float, JSON, ForeignKey, CheckConstraint, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func as sql_func
 
-Base = declarative_base()
+# Import Base from session module to ensure single declarative base
+from .session import Base
 
 
 class SessionDocument(Base):
@@ -43,7 +44,7 @@ class SessionDocument(Base):
     )
     
     # Relationships
-    session = relationship('Session', back_populates='documents')
+    session = relationship('Session', back_populates='session_documents')
     
     @property
     def is_ready(self) -> bool:

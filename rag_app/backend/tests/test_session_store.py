@@ -182,7 +182,9 @@ class TestPostgreSQLSessionStore:
             SessionModel(id=uuid4(), expires_at=datetime.utcnow() + timedelta(hours=1)),
             SessionModel(id=uuid4(), expires_at=datetime.utcnow() + timedelta(hours=2)),
         ]
-        mock_db.query().filter().all.return_value = sessions
+        mock_query = Mock()
+        mock_query.all.return_value = sessions
+        mock_db.query.return_value = mock_query
         
         # Act
         result = session_store.list()

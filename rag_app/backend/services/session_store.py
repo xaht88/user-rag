@@ -6,7 +6,7 @@ from uuid import uuid4
 from sqlalchemy.orm import Session as DBSession
 from sqlalchemy import and_
 
-from ..models import Session as SessionModel
+from models import Session as SessionModel
 
 
 class PostgreSQLSessionStore:
@@ -26,13 +26,15 @@ class PostgreSQLSessionStore:
     def create(
         self,
         user_id: Optional[str] = None,
-        ttl_hours: int = 24
+        ttl_hours: int = 24,
+        llm_config: Optional[Dict[str, Any]] = None
     ) -> SessionModel:
         """Create a new session.
         
         Args:
             user_id: Optional user identifier
             ttl_hours: Time to live in hours
+            llm_config: Optional LLM configuration
             
         Returns:
             Created session model
@@ -43,8 +45,8 @@ class PostgreSQLSessionStore:
             id=uuid4(),
             user_id=user_id,
             expires_at=expires_at,
-            llm_config={},
-            metadata={}
+            llm_config=llm_config or {},
+            session_metadata={}
         )
         self.db.add(session)
         self.db.commit()
@@ -75,13 +77,15 @@ class PostgreSQLSessionStore:
     def update(
         self,
         session_id: str,
-        updates: Dict[str, Any]
+        llm_config: Optional[Dict[str, Any]] = None,
+        session_metadata: Optional[Dict[str, Any]] = None
     ) -> Optional[SessionModel]:
         """Update a session.
         
         Args:
             session_id: Session identifier
-            updates: Dictionary of fields to update
+            llm_config: Optional LLM configuration to update
+            session_metadata: Optional metadata to update
             
         Returns:
             Updated session model or None
@@ -90,9 +94,10 @@ class PostgreSQLSessionStore:
         if not session:
             return None
         
-        for key, value in updates.items():
-            if hasattr(session, key):
-                setattr(session, key, value)
+        if llm_config is not None:
+            session.llm_config = llm_config
+        if session_metadata is not None:
+            session.session_metadata = session_metadata
         
         self.db.commit()
         self.db.refresh(session)
@@ -133,15 +138,24 @@ class PostgreSQLSessionStore:
         
         return query.all()
     
-    def cleanup_expired(self) -> int:
+    def cleanup_expired(self, days: Optional[int] = None) -> int:
         """Remove all expired sessions.
         
+        Args:
+            days: Optional filter for sessions older than N days
+            
         Returns:
             Number of sessions deleted
         """
-        result = self.db.query(SessionModel).filter(
-            SessionModel.expires_at < datetime.utcnow()
-        ).delete(synchronize_session=False)
+        query = self.db.query(SessionModel)
+        
+        if days:
+            cutoff = datetime.utcnow() - timedelta(days=days)
+            query = query.filter(SessionModel.expires_at < cutoff)
+        else:
+            query = query.filter(SessionModel.expires_at < datetime.utcnow())
+        
+        result = query.delete(synchronize_session=False)
         
         self.db.commit()
         return result

@@ -4,8 +4,8 @@ from typing import Optional, List, Dict, Any
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from ..database import get_db
-from ..models import Session as SessionModel
+from database import get_db
+from models import Session as SessionModel
 from .session_store import PostgreSQLSessionStore
 
 
@@ -54,18 +54,24 @@ class SessionManager:
     def update_session(
         self,
         session_id: str,
-        updates: Dict[str, Any]
+        llm_config: Optional[Dict[str, Any]] = None,
+        session_metadata: Optional[Dict[str, Any]] = None
     ) -> Optional[SessionModel]:
         """Update a session.
         
         Args:
             session_id: Session identifier
-            updates: Dictionary of fields to update
+            llm_config: Optional LLM configuration to update
+            session_metadata: Optional metadata to update
             
         Returns:
             Updated session model or None
         """
-        return self.store.update(session_id, updates)
+        return self.store.update(
+            session_id=session_id,
+            llm_config=llm_config,
+            session_metadata=session_metadata
+        )
     
     def delete_session(self, session_id: str) -> bool:
         """Delete a session.

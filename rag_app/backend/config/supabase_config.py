@@ -13,8 +13,8 @@ from httpx import Client, Timeout
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
-# Load environment variables from .env.local
-load_dotenv('rag_app/backend/.env.local')
+# Load environment variables from .env
+load_dotenv()
 
 
 class SupabaseConfig(BaseSettings):

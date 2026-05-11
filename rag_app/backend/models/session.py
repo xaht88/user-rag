@@ -5,7 +5,7 @@ from typing import Optional, List, Dict, Any
 from uuid import uuid4
 from sqlalchemy import Column, String, Text, DateTime, Boolean, Integer, Float, JSON, ForeignKey, CheckConstraint, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.orm import relationship, declarative_base, deferred
 from sqlalchemy.sql import func as sql_func
 
 Base = declarative_base()
@@ -35,7 +35,7 @@ class Session(Base):
     session_metadata = Column(JSON, nullable=True, default=dict)
     
     # Relationships
-    documents = relationship('SessionDocument', back_populates='session', cascade='all, delete-orphan')
+    session_documents = relationship('SessionDocument', back_populates='session', cascade='all, delete-orphan')
     messages = relationship('ChatMessage', back_populates='session', cascade='all, delete-orphan')
     
     @property
