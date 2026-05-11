@@ -40,7 +40,7 @@ app = FastAPI(
 )
 
 # Database initialization
-from database import init_db, cleanup_db
+from database import engine, Base
 
 # CORS middleware
 app.add_middleware(
@@ -658,20 +658,29 @@ async def index():
 
 
 # Lifespan context manager for startup/shutdown
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database on startup."""
-    logger.info("Initializing database...")
-    init_db()
-    logger.info("Database initialized successfully")
+from contextlib import asynccontextmanager
 
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Cleanup database connections on shutdown."""
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifespan."""
+    # Startup: Create tables
+    logger.info("Creating database tables...")
+    Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created successfully")
+    
+    yield
+    
+    # Shutdown: Dispose engine
     logger.info("Cleaning up database connections...")
-    cleanup_db()
+    await engine.dispose()
     logger.info("Database cleanup complete")
+
+app = FastAPI(
+    title="RAG Chat Application",
+    version="2.0.0",
+    description="Production-ready RAG application with Supabase integration",
+    lifespan=lifespan
+)
 
 
 if __name__ == "__main__":

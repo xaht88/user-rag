@@ -448,8 +448,10 @@ Use managed PostgreSQL (AWS RDS, Google Cloud SQL, etc.)
 3. ✅ **SQLAlchemy models** — модели Session, SessionDocument, ChatMessage, MessageSource созданы
 4. ✅ **Alembic migrations** — миграция 20260511125148_initial_schema.py создана
 5. ✅ **PostgreSQLSessionStore** — слой хранения сессий реализован и протестирован
-6. ✅ **Testing** — 15 unit-тестов пройдено (100% coverage для session_store)
-7. ⏳ **Documentation** — обновить deployment guide и README.md
+6. ✅ **Session Manager** — SessionManager создан для интеграции с FastAPI
+7. ✅ **main.py обновлён** — lifespan контекст для инициализации БД добавлен
+8. ⏳ **Integration tests** — написать интеграционные тесты для API endpoints
+9. ⏳ **Documentation** — обновить deployment guide и README.md
 
 ## Notes
 

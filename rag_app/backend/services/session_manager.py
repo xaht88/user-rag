@@ -1,109 +1,77 @@
-"""
-Session Manager - High-level session management.
-
-Coordinates session operations with database and vector store.
-"""
-
-import logging
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+"""Session manager for RAG Chat Application."""
 
 from typing import Optional, List, Dict, Any
-
 from fastapi import Depends
+from sqlalchemy.orm import Session
 
-from database import get_db
-from models import Session as SessionModel
+from ..database import get_db
+from ..models import Session as SessionModel
 from .session_store import PostgreSQLSessionStore
-
-logger = logging.getLogger(__name__)
 
 
 class SessionManager:
-    """
-    High-level session manager.
+    """Manages session lifecycle and operations.
     
-    Provides convenient methods for session operations.
-    Uses PostgreSQLSessionStore for persistence.
+    Provides high-level session operations including creation,
+    retrieval, update, and deletion.
     """
     
-    def __init__(self, db=Depends(get_db)):
-        """
-        Initialize session manager.
+    def __init__(self, db: Session = Depends(get_db)):
+        """Initialize session manager.
         
         Args:
-            db: Database session (injected via FastAPI Depends)
+            db: Database session from FastAPI dependency
         """
         self.store = PostgreSQLSessionStore(db)
     
     def create_session(
         self,
         user_id: Optional[str] = None,
-        ttl_hours: int = 24,
-        llm_config: Optional[Dict[str, Any]] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        ttl_hours: int = 24
     ) -> SessionModel:
-        """
-        Create a new session.
+        """Create a new session.
         
         Args:
-            user_id: Optional user ID
-            ttl_hours: Session TTL in hours
-            llm_config: LLM configuration
-            metadata: Additional metadata
+            user_id: Optional user identifier
+            ttl_hours: Time to live in hours
             
         Returns:
-            Created Session model
+            Created session model
         """
-        return self.store.create(
-            user_id=user_id,
-            ttl_hours=ttl_hours,
-            llm_config=llm_config,
-            metadata=metadata
-        )
+        return self.store.create(user_id=user_id, ttl_hours=ttl_hours)
     
     def get_session(self, session_id: str) -> Optional[SessionModel]:
-        """
-        Get a session by ID.
+        """Get a session by ID.
         
         Args:
-            session_id: Session UUID
+            session_id: Session identifier
             
         Returns:
-            Session model or None
+            Session model or None if not found/expired
         """
         return self.store.get(session_id)
     
     def update_session(
         self,
         session_id: str,
-        llm_config: Optional[Dict[str, Any]] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        updates: Dict[str, Any]
     ) -> Optional[SessionModel]:
-        """
-        Update session configuration.
+        """Update a session.
         
         Args:
-            session_id: Session UUID
-            llm_config: New LLM configuration
-            metadata: New metadata
+            session_id: Session identifier
+            updates: Dictionary of fields to update
             
         Returns:
-            Updated Session model or None
+            Updated session model or None
         """
-        return self.store.update(
-            session_id=session_id,
-            llm_config=llm_config,
-            metadata=metadata
-        )
+        return self.store.update(session_id, updates)
     
     def delete_session(self, session_id: str) -> bool:
-        """
-        Delete a session.
+        """Delete a session.
         
         Args:
-            session_id: Session UUID
+            session_id: Session identifier
             
         Returns:
             True if deleted, False if not found
@@ -111,25 +79,20 @@ class SessionManager:
         return self.store.delete(session_id)
     
     def list_sessions(self, user_id: Optional[str] = None) -> List[SessionModel]:
-        """
-        List all active sessions.
+        """List all sessions.
         
         Args:
-            user_id: Optional filter by user ID
+            user_id: Optional user filter
             
         Returns:
-            List of active sessions
+            List of session models
         """
-        return self.store.list(user_id=user_id)
+        return self.store.list(user_id)
     
-    def cleanup_old_sessions(self, days: int = 30) -> int:
-        """
-        Clean up old expired sessions.
+    def cleanup_expired_sessions(self) -> int:
+        """Remove all expired sessions.
         
-        Args:
-            days: Delete sessions older than this many days
-            
         Returns:
-            Number of deleted sessions
+            Number of sessions deleted
         """
-        return self.store.cleanup_expired(days=days)
+        return self.store.cleanup_expired()

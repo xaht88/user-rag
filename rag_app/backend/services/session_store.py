@@ -1,59 +1,41 @@
-"""
-PostgreSQL Session Store implementation.
+"""PostgreSQL session store implementation."""
 
-Provides persistent session storage using PostgreSQL database.
-"""
-
-import logging
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
+from datetime import datetime, timedelta
 from uuid import uuid4
-
 from sqlalchemy.orm import Session as DBSession
+from sqlalchemy import and_
 
-from models import Session as SessionModel
-
-logger = logging.getLogger(__name__)
+from ..models import Session as SessionModel
 
 
 class PostgreSQLSessionStore:
-    """
-    PostgreSQL implementation of session storage.
+    """PostgreSQL implementation of session storage.
     
-    Provides CRUD operations for sessions with automatic TTL management.
+    Provides CRUD operations for sessions using SQLAlchemy ORM.
     """
     
     def __init__(self, db: DBSession):
-        """
-        Initialize session store.
+        """Initialize session store.
         
         Args:
-            db: Database session from SQLAlchemy
+            db: SQLAlchemy database session
         """
         self.db = db
     
     def create(
         self,
         user_id: Optional[str] = None,
-        ttl_hours: int = 24,
-        llm_config: Optional[Dict[str, Any]] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        ttl_hours: int = 24
     ) -> SessionModel:
-        """
-        Create a new session.
+        """Create a new session.
         
         Args:
-            user_id: Optional user ID for authenticated sessions
-            ttl_hours: Time to live in hours (default: 24)
-            llm_config: LLM configuration dictionary
-            metadata: Additional session metadata
+            user_id: Optional user identifier
+            ttl_hours: Time to live in hours
             
         Returns:
-            Created Session model instance
+            Created session model
         """
         expires_at = datetime.utcnow() + timedelta(hours=ttl_hours)
         
@@ -61,85 +43,69 @@ class PostgreSQLSessionStore:
             id=uuid4(),
             user_id=user_id,
             expires_at=expires_at,
-            llm_config=llm_config or {},
-            metadata=metadata or {}
+            llm_config={},
+            metadata={}
         )
-        
         self.db.add(session)
         self.db.commit()
         self.db.refresh(session)
         
-        logger.info(f"Created session {session.id} with TTL={ttl_hours}h")
         return session
     
     def get(self, session_id: str) -> Optional[SessionModel]:
-        """
-        Get a session by ID.
-        
-        Automatically removes expired sessions.
+        """Get a session by ID.
         
         Args:
-            session_id: Session UUID
+            session_id: Session identifier
             
         Returns:
-            Session model instance or None if not found/expired
+            Session model or None if not found/expired
         """
         session = self.db.query(SessionModel).filter(
             SessionModel.id == session_id
         ).first()
         
-        if session:
-            if session.is_expired:
-                logger.info(f"Removing expired session {session_id}")
-                self.db.delete(session)
-                self.db.commit()
-                return None
-            # Extend TTL on access
-            session.extend_ttl(hours=1)
+        if session and session.is_expired:
+            self.db.delete(session)
+            self.db.commit()
+            return None
         
-        return session
+        return session if session else None
     
     def update(
         self,
         session_id: str,
-        llm_config: Optional[Dict[str, Any]] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        updates: Dict[str, Any]
     ) -> Optional[SessionModel]:
-        """
-        Update session configuration.
+        """Update a session.
         
         Args:
-            session_id: Session UUID
-            llm_config: New LLM configuration
-            metadata: New metadata
+            session_id: Session identifier
+            updates: Dictionary of fields to update
             
         Returns:
-            Updated Session model or None if not found
+            Updated session model or None
         """
         session = self.get(session_id)
+        if not session:
+            return None
         
-        if session:
-            if llm_config is not None:
-                session.llm_config = llm_config
-            if metadata is not None:
-                session.metadata = metadata
-            
-            self.db.commit()
-            self.db.refresh(session)
-            
-            logger.info(f"Updated session {session_id}")
+        for key, value in updates.items():
+            if hasattr(session, key):
+                setattr(session, key, value)
         
+        self.db.commit()
+        self.db.refresh(session)
         return session
     
     def delete(self, session_id: str) -> bool:
-        """
-        Delete a session.
+        """Delete a session.
         
         Args:
-            session_id: Session UUID
+            session_id: Session identifier
             
         Returns:
-            True if session was deleted, False if not found
+            True if deleted, False if not found
         """
         session = self.db.query(SessionModel).filter(
             SessionModel.id == session_id
@@ -148,52 +114,34 @@ class PostgreSQLSessionStore:
         if session:
             self.db.delete(session)
             self.db.commit()
-            logger.info(f"Deleted session {session_id}")
             return True
-        
         return False
     
     def list(self, user_id: Optional[str] = None) -> List[SessionModel]:
-        """
-        List all active sessions.
+        """List all sessions.
         
         Args:
-            user_id: Optional filter by user ID
+            user_id: Optional user filter
             
         Returns:
-            List of active Session model instances
+            List of session models
         """
         query = self.db.query(SessionModel)
         
         if user_id:
             query = query.filter(SessionModel.user_id == user_id)
         
-        # Exclude expired sessions
-        now = datetime.utcnow()
-        query = query.filter(
-            (SessionModel.expires_at.is_(None)) |
-            (SessionModel.expires_at > now)
-        )
-        
         return query.all()
     
-    def cleanup_expired(self, days: int = 30) -> int:
-        """
-        Clean up expired sessions older than specified days.
+    def cleanup_expired(self) -> int:
+        """Remove all expired sessions.
         
-        Args:
-            days: Number of days to keep sessions (default: 30)
-            
         Returns:
-            Number of deleted sessions
+            Number of sessions deleted
         """
-        cutoff_date = datetime.utcnow() - timedelta(days=days)
-        
         result = self.db.query(SessionModel).filter(
-            SessionModel.expires_at < cutoff_date
-        ).delete()
+            SessionModel.expires_at < datetime.utcnow()
+        ).delete(synchronize_session=False)
         
         self.db.commit()
-        
-        logger.info(f"Cleaned up {result} sessions older than {days} days")
         return result

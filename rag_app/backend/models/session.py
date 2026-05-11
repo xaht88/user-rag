@@ -1,107 +1,62 @@
-"""
-Session model - maps to public.sessions table.
+"""Session model for Supabase PostgreSQL."""
 
-Represents a RAG conversation session with document context.
-"""
+from datetime import datetime, timedelta
+from typing import Optional, List, Dict, Any
+from uuid import uuid4
+from sqlalchemy import Column, String, Text, DateTime, Boolean, Integer, Float, JSON, ForeignKey, CheckConstraint, UniqueConstraint, func
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.sql import func as sql_func
 
-from datetime import datetime
-from typing import Optional
-from uuid import UUID, uuid4
-
-from sqlalchemy import Column, String, Text, TIMESTAMP, ForeignKey, JSON
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
-from sqlalchemy.orm import relationship
-
-from .base import Base
+Base = declarative_base()
 
 
 class Session(Base):
-    """Conversation session model."""
+    """User session with TTL and LLM configuration.
     
-    __tablename__ = "sessions"
+    Attributes:
+        id: Unique session identifier
+        user_id: Optional user identifier for authenticated sessions
+        created_at: Session creation timestamp
+        updated_at: Last update timestamp
+        expires_at: Session expiration timestamp
+        llm_config: LLM configuration (model, temperature, etc.)
+        metadata: Additional session metadata
+    """
     
-    id: Column[UUID] = Column(
-        PGUUID(as_uuid=True),
-        primary_key=True,
-        default=uuid4,
-        comment="Session ID"
-    )
-    user_id: Column[UUID] = Column(
-        PGUUID(as_uuid=True),
-        ForeignKey("profiles.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
-        comment="User ID"
-    )
-    title: Column[str] = Column(
-        String(500),
-        nullable=False,
-        default="New Conversation",
-        comment="Session title"
-    )
-    created_at: Column[datetime] = Column(
-        TIMESTAMP(timezone=True),
-        default=datetime.utcnow,
-        nullable=False,
-        comment="Creation timestamp"
-    )
-    updated_at: Column[datetime] = Column(
-        TIMESTAMP(timezone=True),
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
-        nullable=False,
-        comment="Last update timestamp"
-    )
-    metadata: Column[dict] = Column(
-        JSON,
-        nullable=False,
-        default=dict,
-        comment="Additional metadata (JSONB)"
-    )
+    __tablename__ = 'sessions'
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    user_id = Column(UUID(as_uuid=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=sql_func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=sql_func.now(), onupdate=sql_func.now())
+    expires_at = Column(DateTime(timezone=True), nullable=True)
+    llm_config = Column(JSON, nullable=False, default=dict)
+    metadata = Column(JSON, nullable=True, default=dict)
     
     # Relationships
-    user: relationship = relationship(
-        "Profile",
-        back_populates="sessions"
-    )
-    messages: relationship = relationship(
-        "Message",
-        back_populates="session",
-        cascade="all, delete-orphan",
-        order_by="Message.created_at"
-    )
-    documents: relationship = relationship(
-        "Document",
-        back_populates="session",
-        cascade="all, delete-orphan"
-    )
+    documents = relationship('SessionDocument', back_populates='session', cascade='all, delete-orphan')
+    messages = relationship('ChatMessage', back_populates='session', cascade='all, delete-orphan')
     
-    def add_message(self, role: str, content: str) -> "Message":
-        """Add a message to the session."""
-        from .message import Message
+    @property
+    def is_expired(self) -> bool:
+        """Check if session has expired."""
+        if self.expires_at is None:
+            return False
+        return datetime.utcnow() > self.expires_at
+    
+    @property
+    def ttl_seconds(self) -> int:
+        """Time to live in seconds."""
+        if self.expires_at is None:
+            return 0
+        delta = self.expires_at - datetime.utcnow()
+        return int(delta.total_seconds())
+    
+    def extend_ttl(self, hours: int = 24) -> None:
+        """Extend session TTL.
         
-        message = Message(
-            id=uuid4(),
-            session_id=self.id,
-            role=role,
-            content=content
-        )
-        self.messages.append(message)
-        return message
-    
-    def update_title(self, title: str) -> None:
-        """Update session title."""
-        self.title = title[:500]
-    
-    def to_dict(self) -> dict:
-        """Convert model to dictionary."""
-        return {
-            "id": str(self.id),
-            "user_id": str(self.user_id),
-            "title": self.title,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
-            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
-            "metadata": self.metadata,
-            "message_count": len(self.messages),
-            "document_count": len(self.documents),
-        }
+        Args:
+            hours: Number of hours to extend
+        """
+        self.expires_at = datetime.utcnow() + timedelta(hours=hours)
