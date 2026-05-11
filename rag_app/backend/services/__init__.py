@@ -1,18 +1,11 @@
 """
-Services package for RAG Chat Application.
-
-This package contains service classes for:
-- Authentication (AuthService)
-- Vector Storage (VectorStoreService)
-- File Storage (StorageService)
+Services package for business logic.
 """
 
-from services.auth_service import AuthService
-from services.vector_store import VectorStoreService
-from services.storage_service import StorageService
+from .session_manager import SessionManager
+from .session_store import PostgreSQLSessionStore
 
 __all__ = [
-    "AuthService",
-    "VectorStoreService",
-    "StorageService"
+    "SessionManager",
+    "PostgreSQLSessionStore",
 ]

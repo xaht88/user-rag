@@ -39,6 +39,9 @@ app = FastAPI(
     description="Production-ready RAG application with Supabase integration"
 )
 
+# Database initialization
+from database import init_db, cleanup_db
+
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
@@ -54,6 +57,9 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # Зависимости
 security = HTTPBearer()
+
+# Session manager dependency
+from services.session_manager import SessionManager
 
 # Модели данных
 class DocumentInfo(BaseModel):
@@ -649,6 +655,23 @@ async def index():
     """Главная страница"""
     with open("templates/index.html", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
+
+
+# Lifespan context manager for startup/shutdown
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database on startup."""
+    logger.info("Initializing database...")
+    init_db()
+    logger.info("Database initialized successfully")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanup database connections on shutdown."""
+    logger.info("Cleaning up database connections...")
+    cleanup_db()
+    logger.info("Database cleanup complete")
 
 
 if __name__ == "__main__":
