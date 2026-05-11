@@ -16,7 +16,7 @@ from mocks.supabase_mock import create_mock_supabase_client
 
 @pytest.fixture(autouse=True)
 def mock_supabase_client():
-    """Mock Supabase client for all tests."""
+    """Mock Supabase client for all tests with persistent data storage."""
     mock_client = create_mock_supabase_client()
     
     # Patch both possible import paths

@@ -12,6 +12,7 @@ class MockSupabaseClient:
         self.url = url
         self.api_key = api_key
         self._data = {}
+        self._current_user = None
     
     def table(self, table_name: str):
         """Get table reference."""
@@ -27,6 +28,10 @@ class MockSupabaseClient:
     def auth(self):
         """Get auth helper."""
         return MockAuth(self)
+    
+    def set_current_user(self, user_id: str):
+        """Set current user for testing."""
+        self._current_user = user_id
     
     @property
     def storage(self):
@@ -174,9 +179,9 @@ class MockTable:
         
         return MockResponse(results)
     
-    def insert(self):
+    def insert(self, values=None):
         """Start INSERT."""
-        return MockInsert(self)
+        return MockInsert(self, values)
     
     def update(self):
         """Start UPDATE."""
@@ -197,9 +202,11 @@ class MockResponse:
 class MockInsert:
     """Mock INSERT builder."""
     
-    def __init__(self, table: MockTable):
+    def __init__(self, table: MockTable, values=None):
         self.table = table
         self._values = []
+        if values:
+            self._values.append(values)
     
     def values(self, *args, **kwargs):
         """Set values to insert."""
@@ -231,6 +238,19 @@ class MockInsert:
                 results.append(row)
         
         return MockResponse(results)
+    
+    def values(self, *args, **kwargs):
+        """Set values to insert."""
+        if args:
+            self._values.extend(args)
+        if kwargs:
+            self._values.append(kwargs)
+        return self
+    
+    def select(self, columns: str = "*"):
+        """Return inserted data."""
+        self._returning = columns
+        return self
 
 
 class MockUpdate:
@@ -337,6 +357,8 @@ class MockAuth:
     
     def get_user(self):
         """Get current user."""
+        if self.client._current_user:
+            return {"user": {"id": self.client._current_user, "email": "test@example.com"}}
         return {"user": {"id": str(uuid4()), "email": "test@example.com"}}
     
     def sign_out(self):
