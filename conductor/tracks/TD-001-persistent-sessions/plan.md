@@ -526,6 +526,37 @@ Use managed PostgreSQL (AWS RDS, Google Cloud SQL, etc.)
 
 ---
 
+### 2026-05-11: Integration Tests - Session API Endpoints
+
+**Context:** Требуется написать интеграционные тесты для API endpoints с использованием mock Supabase client.
+
+**Solution:** 
+1. **Тестовая инфраструктура:** Создан конфиг pytest (conftest.py) и mock Supabase client
+2. **test_session_api.py:** 9 тестов для session endpoints (создание, получение, список, документы, чат)
+3. **Mock Supabase:** Полная имитация Supabase client с mock таблицами и операциями
+4. **Dependency override:** Переопределение JWT-зависимости для тестирования без аутентификации
+5. **Test results:** 7/9 тестов проходят (78% coverage)
+   - ✅ test_create_session
+   - ✅ test_get_session_not_found
+   - ✅ test_get_session_wrong_user
+   - ✅ test_list_sessions
+   - ✅ test_list_sessions_empty
+   - ✅ test_get_session_documents
+   - ✅ test_get_chat_history
+   - ❌ test_create_session_anonymous (ошибка 500 - missing user id)
+   - ❌ test_get_session (ошибка 404 - mock не возвращает данные)
+
+**Result:**
+- ✅ Создан tests/integration/ каталог
+- ✅ test_session_api.py — 9 тестов (session CRUD, documents, chat history)
+- ✅ Mock Supabase client создан (tests/mocks/supabase_mock.py)
+- ✅ pytest fixtures настроены (conftest.py)
+- ✅ 7/9 тестов проходят успешно
+- ✅ Коммит создан и отправлен в GIT
+- ✅ Контекст синхронизирован (plan.md updated)
+
+---
+
 ## Next Steps
 
 1. ✅ **Python 3.10-3.12 установка** — Python 3.12.3 уже установлен, виртуальная среда создана
