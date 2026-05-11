@@ -441,6 +441,29 @@ Use managed PostgreSQL (AWS RDS, Google Cloud SQL, etc.)
 
 ---
 
+### 2026-05-11: Integration Tests - API Endpoints
+
+**Context:** Требуется написать интеграционные тесты для API endpoints с использованием реального тестового БД.
+
+**Solution:** 
+1. **Тестовая инфраструктура:** Создан тестовый SQLite БД для изоляции интеграционных тестов
+2. **test_session_api.py:** 10 тестов для session endpoints (создание, получение, список, документы, чат)
+3. **test_document_api.py:** 8 тестов для document endpoints (загрузка, список, toggle, удаление)
+4. **test_auth_api.py:** 7 тестов для auth endpoints (регистрация, вход, профиль)
+5. **Fixture setup:** Автоматическое создание/очистка таблиц между тестами
+6. **Mock dependencies:** Override FastAPI dependencies для тестирования
+
+**Result:**
+- ✅ Создан tests/integration/ каталог
+- ✅ test_session_api.py — 10 тестов (session CRUD, documents, chat history)
+- ✅ test_document_api.py — 8 тестов (upload, list, toggle, delete)
+- ✅ test_auth_api.py — 7 тестов (register, login, profile)
+- ✅ Все тесты используют изолированный тестовый БД
+- ✅ Автоматическая очистка тестовых данных
+- ✅ Контекст синхронизирован (plan.md updated)
+
+---
+
 ## Next Steps
 
 1. ✅ **Python 3.10-3.12 установка** — Python 3.12.3 уже установлен, виртуальная среда создана
@@ -450,7 +473,7 @@ Use managed PostgreSQL (AWS RDS, Google Cloud SQL, etc.)
 5. ✅ **PostgreSQLSessionStore** — слой хранения сессий реализован и протестирован
 6. ✅ **Session Manager** — SessionManager создан для интеграции с FastAPI
 7. ✅ **main.py обновлён** — lifespan контекст для инициализации БД добавлен
-8. ⏳ **Integration tests** — написать интеграционные тесты для API endpoints
+8. ✅ **Integration tests** — написаны интеграционные тесты для API endpoints (3 файла, 25+ тестов)
 9. ⏳ **Documentation** — обновить deployment guide и README.md
 
 ## Notes
