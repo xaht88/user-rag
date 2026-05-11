@@ -21,7 +21,7 @@ class Session(Base):
         updated_at: Last update timestamp
         expires_at: Session expiration timestamp
         llm_config: LLM configuration (model, temperature, etc.)
-        metadata: Additional session metadata
+        session_metadata: Additional session metadata
     """
     
     __tablename__ = 'sessions'
@@ -32,7 +32,7 @@ class Session(Base):
     updated_at = Column(DateTime(timezone=True), server_default=sql_func.now(), onupdate=sql_func.now())
     expires_at = Column(DateTime(timezone=True), nullable=True)
     llm_config = Column(JSON, nullable=False, default=dict)
-    metadata = Column(JSON, nullable=True, default=dict)
+    session_metadata = Column(JSON, nullable=True, default=dict)
     
     # Relationships
     documents = relationship('SessionDocument', back_populates='session', cascade='all, delete-orphan')

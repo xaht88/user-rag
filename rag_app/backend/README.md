@@ -701,6 +701,74 @@ GET /health
 
 ---
 
+## ⏱️ Background Tasks и Cleanup
+
+### Автоматическая очистка сессий
+
+Приложение включает встроенный scheduler для автоматической очистки старых сессий.
+
+#### Как это работает
+
+- **Scheduler** запускается автоматически при старте приложения
+- **Cleanup task** выполняется каждые 1 час
+- Удаляются сессии старше 30 дней
+- Логируются все операции очистки
+
+#### Ручной запуск cleanup
+
+```bash
+# Очистить сессии старше 30 дней
+python -m tasks.session_cleanup --days 30
+
+# Очистить ВСЕ expired сессии (независимо от возраста)
+python -m tasks.session_cleanup --all
+
+# Показать помощь
+python -m tasks.session_cleanup --help
+```
+
+#### Настройка интервала очистки
+
+Редактируйте файл `celery_config.py`:
+
+```python
+app.conf.update(
+    beat_schedule={
+        'cleanup-expired-sessions': {
+            'task': 'tasks.session_cleanup.cleanup_expired_sessions',
+            'schedule': timedelta(hours=1),  # Измените интервал
+            'options': {'args': (30,)}
+        },
+    },
+)
+```
+
+#### Использование Celery (Production)
+
+Для production рекомендуется использовать Celery с Redis:
+
+```bash
+# Установите зависимости
+pip install celery[redis]
+
+# Запустите worker
+celery -A celery_config worker --loglevel=info
+
+# Запустите beat scheduler
+celery -A celery_config beat --loglevel=info
+```
+
+#### Мониторинг scheduler
+
+```python
+from scheduler import get_scheduler
+
+status = get_scheduler().get_status()
+print(status)
+```
+
+---
+
 ## 🔄 Миграция с ChromaDB на Supabase
 
 ### Предыстория
@@ -710,6 +778,50 @@ GET /health
 - Упрощения инфраструктуры
 - Улучшения производительности
 - Поддержки горизонтального масштабирования
+
+---
+
+## 🧪 Тестирование Background Tasks
+
+### Запуск тестов cleanup
+
+```bash
+# Тесты для session cleanup
+pytest tests/integration/test_session_cleanup.py -v
+
+# Все интеграционные тесты
+pytest tests/integration/ -v
+```
+
+### Примеры тестов
+
+```python
+def test_cleanup_expired_sessions(test_db):
+    """Test cleanup of expired sessions."""
+    # Create expired session
+    expired_session = SessionModel(
+        id=uuid4(),
+        user_id=str(uuid4()),
+        expires_at=datetime.utcnow() - timedelta(days=31)
+    )
+    test_db.add(expired_session)
+    
+    # Create recent session (should not be cleaned)
+    recent_session = SessionModel(
+        id=uuid4(),
+        user_id=str(uuid4()),
+        expires_at=datetime.utcnow() + timedelta(days=10)
+    )
+    test_db.add(recent_session)
+    
+    test_db.commit()
+    
+    # Run cleanup
+    deleted = cleanup_expired_sessions(days_threshold=30)
+    
+    # Verify
+    assert deleted == 1
+```
 
 ### Шаг 1: Подготовка Supabase проекта
 

@@ -248,7 +248,7 @@ async def create_session(
             "id": session_id,
             "user_id": current_user["id"],
             "title": "New Conversation",
-            "metadata": {}
+            "session_metadata": {}
         }).execute()
         
         return JSONResponse({
@@ -657,6 +657,9 @@ async def index():
         return HTMLResponse(content=f.read())
 
 
+# Scheduler integration
+from scheduler import start_scheduler, stop_scheduler, get_scheduler
+
 # Lifespan context manager for startup/shutdown
 from contextlib import asynccontextmanager
 
@@ -668,11 +671,20 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     logger.info("Database tables created successfully")
     
+    # Start background scheduler
+    logger.info("Starting background task scheduler...")
+    start_scheduler()
+    logger.info("Background task scheduler started")
+    
     yield
     
     # Shutdown: Dispose engine
     logger.info("Cleaning up database connections...")
     await engine.dispose()
+    
+    # Stop scheduler
+    logger.info("Stopping background task scheduler...")
+    stop_scheduler()
     logger.info("Database cleanup complete")
 
 app = FastAPI(

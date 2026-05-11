@@ -20,7 +20,7 @@ class ChatMessage(Base):
         role: Message role (user, assistant, system)
         content: Message content
         created_at: Creation timestamp
-        metadata: Additional message metadata
+        message_metadata: Additional message metadata
     """
     
     __tablename__ = 'chat_messages'
@@ -30,7 +30,7 @@ class ChatMessage(Base):
     role = Column(String(20), nullable=False)
     content = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=sql_func.now())
-    metadata = Column(JSON, nullable=True, default=dict)
+    message_metadata = Column(JSON, nullable=True, default=dict)
     
     # Relationships
     session = relationship('Session', back_populates='messages')
