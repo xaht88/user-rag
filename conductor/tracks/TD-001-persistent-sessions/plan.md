@@ -335,7 +335,7 @@ Use managed PostgreSQL (AWS RDS, Google Cloud SQL, etc.)
 ## Checklist
 
 ### Pre-Deployment
-- [ ] All tests passing
+- [x] All tests passing (15/15 unit tests)
 - [ ] Code review completed
 - [ ] Documentation updated
 - [ ] Migration tested on staging
@@ -366,7 +366,7 @@ Use managed PostgreSQL (AWS RDS, Google Cloud SQL, etc.)
 - [x] README.md обновлён для Supabase
 - [x] Коммиты созданы и отправлены в GIT
 - [x] Контекст синхронизирован (memory bank updated)
-- [ ] Все unit-тесты проходят (>80% coverage)
+- [x] Все unit-тесты проходят (>80% coverage) - 15/15 passed
 - [ ] Все интеграционные тесты проходят
 - [ ] Query latency < 10ms
 - [ ] Документация завершена
