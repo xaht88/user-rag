@@ -28,6 +28,7 @@ class Session(Base):
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     user_id = Column(UUID(as_uuid=True), nullable=True)
+    title = Column(String(255), nullable=True, default="New Conversation")
     created_at = Column(DateTime(timezone=True), server_default=sql_func.now())
     updated_at = Column(DateTime(timezone=True), server_default=sql_func.now(), onupdate=sql_func.now())
     expires_at = Column(DateTime(timezone=True), nullable=True)
