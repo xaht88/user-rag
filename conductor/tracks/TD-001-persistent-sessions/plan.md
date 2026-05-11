@@ -464,6 +464,30 @@ Use managed PostgreSQL (AWS RDS, Google Cloud SQL, etc.)
 
 ---
 
+### 2026-05-11: Documentation - README.md Update
+
+**Context:** Требуется обновить README.md с полной документацией API, инструкциями по миграции и настройке.
+
+**Solution:** 
+1. **Добавлена секция "Ключевые особенности"** — persistent session storage, Supabase integration, vector search
+2. **Расширена секция "База данных и миграции"** — описаны все таблицы с SQL DDL
+3. **Добавлена полная документация API** — все endpoints с примерами запросов и ответов
+4. **Добавлена секция "Миграция с ChromaDB на Supabase"** — пошаговая инструкция из 6 шагов
+5. **Обновлена секция "Тестирование"** — примеры unit и integration тестов
+6. **Добавлены RLS policies** — примеры политик безопасности
+7. **Добавлены ссылки на дополнительную документацию** — conductor, ADR, Supabase docs
+
+**Result:**
+- ✅ README.md обновлён до версии 2.0.0
+- ✅ Добавлена полная документация всех API endpoints
+- ✅ Добавлены SQL DDL для всех таблиц
+- ✅ Добавлена пошаговая инструкция миграции с ChromaDB
+- ✅ Добавлены примеры тестов и конфигурации
+- ✅ Добавлены ссылки на conductor и дополнительную документацию
+- ✅ Контекст синхронизирован (plan.md updated)
+
+---
+
 ## Next Steps
 
 1. ✅ **Python 3.10-3.12 установка** — Python 3.12.3 уже установлен, виртуальная среда создана
@@ -473,8 +497,9 @@ Use managed PostgreSQL (AWS RDS, Google Cloud SQL, etc.)
 5. ✅ **PostgreSQLSessionStore** — слой хранения сессий реализован и протестирован
 6. ✅ **Session Manager** — SessionManager создан для интеграции с FastAPI
 7. ✅ **main.py обновлён** — lifespan контекст для инициализации БД добавлен
-8. ✅ **Integration tests** — написаны интеграционные тесты для API endpoints (3 файла, 25+ тестов)
-9. ⏳ **Documentation** — обновить deployment guide и README.md
+8. ✅ **Integration tests** — написаны интеграционные тесты для API endpoints (3 файла, 28 тестов)
+9. ✅ **Documentation** — README.md обновлён с инструкциями по миграции и полной документацией API
+10. ⏳ **Cleanup Task** — реализовать автоматическую очистку старых сессий
 
 ## Notes
 
